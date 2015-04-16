@@ -10,8 +10,8 @@ public class Jet {
 	//private float speed;
 	//private float size;
 	
-	static final float SPEED = 2f;  // unit per second
-	static final float SIZE = 0.5f; // half a unit
+	public static final float SPEED = 4f;  // unit per second
+	public static final float SIZE = 0.5f; // half a unit
 
 	
 	Vector2 position = new Vector2();
@@ -33,9 +33,37 @@ public class Jet {
 	public Vector2 getPosition(){
 		return this.position;
 	}
-    
-	//private boolean facingLeft;
+
+	private boolean facingLeft;
 	
+	public boolean isFacingLeft() {
+		return facingLeft;
+	}
+
+	public void setFacingLeft(boolean facingLeft) {
+		this.facingLeft = facingLeft;
+	}
+
+	public void setState(State newState) {
+		this.state = newState;
+	}
+
+	public void update(float delta) {
+		//if(position.x != destination.x)
+		position.add(velocity.cpy().scl(delta));
+	}
+
+	public Vector2 getVelocity() {
+		return this.velocity;
+	}
+	
+	public Vector2 getAcceleration() {
+		return this.acceleration;
+	}
+
+	public void changeVelocity() {
+		this.velocity.setLength(SPEED);
+	}
 	
 	//GETTERS AND SETTERS
 	/*public float getSpeed(){
