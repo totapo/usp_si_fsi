@@ -3,9 +3,11 @@ package edu.br.usp.each.si.fsi.ultimate.controller;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 import edu.br.usp.each.si.fsi.ultimate.controller.WorldControllerTest.Keys;
+import edu.br.usp.each.si.fsi.ultimate.model.Block;
 import edu.br.usp.each.si.fsi.ultimate.model.Jet;
 import edu.br.usp.each.si.fsi.ultimate.model.Jet.State;
 import edu.br.usp.each.si.fsi.ultimate.model.World;
@@ -13,11 +15,11 @@ import edu.br.usp.each.si.fsi.ultimate.model.World;
 public class WorldController {
 
 	enum Keys {
-		 BOOST, FIRE, MOVE
+		BOOST, FIRE, MOVE
 	}
 
-	private World 	world;
-	private Jet 	jet;
+	private World world;
+	private Jet jet;
 
 	static Map<Keys, Boolean> keys = new HashMap<WorldController.Keys, Boolean>();
 	static {
@@ -33,14 +35,20 @@ public class WorldController {
 
 	// ** Key presses and touches **************** //
 
-	public void movePressed(float destinationX,float destinationY){//,boolean xNegative, boolean yNegative){
-		/*jet.changeVelocity(xNegative, yNegative);
-		jet.setDestination(destinationX,destinationY);*/
-		jet.getVelocity().set(destinationX,destinationY);
-		jet.getVelocity().setLength(Jet.SPEED);//Não altera a velociade mas sim a angulacao.
-		keys.get(keys.put(Keys.MOVE,true));
+	public void movePressed(float destinationX, float destinationY) {// ,boolean
+																		// xNegative,
+																		// boolean
+																		// yNegative){
+		/*
+		 * jet.changeVelocity(xNegative, yNegative);
+		 * jet.setDestination(destinationX,destinationY);
+		 */
+		jet.getVelocity().set(destinationX, destinationY);
+		jet.getVelocity().setLength(Jet.SPEED);// Não altera a velociade mas
+												// sim a angulacao.
+		keys.get(keys.put(Keys.MOVE, true));
 	}
-	
+
 	public void boostPressed() {
 		keys.get(keys.put(Keys.BOOST, true));
 	}
@@ -48,11 +56,11 @@ public class WorldController {
 	public void firePressed() {
 		keys.get(keys.put(Keys.FIRE, true));
 	}
-	
-	public void moveReleased(){
-		keys.get(keys.put(Keys.MOVE,false));
+
+	public void moveReleased() {
+		keys.get(keys.put(Keys.MOVE, false));
 	}
-	
+
 	public void boostReleased() {
 		keys.get(keys.put(Keys.BOOST, false));
 	}
@@ -64,7 +72,35 @@ public class WorldController {
 	/** The main update method **/
 	public void update(float delta) {
 		processInput();
+		checkCollisionWithBlocks(delta);
 		jet.update(delta);
+	}
+
+	/** Collision checking **/
+	private void checkCollisionWithBlocks(float delta) {
+		// scale velocity to frame units
+		jet.getVelocity().cpy().scl(delta);
+
+		Rectangle jetRect = new Rectangle(jet.getPosition().x,
+				jet.getPosition().y, jet.getBounds().width,
+				jet.getBounds().height);
+
+		// if jet collides, make his position (3, 5)
+		for (Block block : world.getBlocks()) {
+			
+			if (block == null)
+				continue;
+			else{
+				block.getBounds().x = block.getPosition().x;
+				block.getBounds().y = block.getPosition().y;
+			}
+			if (jetRect.overlaps(block.getBounds())) {
+				jet.getPosition().set(new Vector2(3, 5));
+				world.getCollisionRects().add(block.getBounds());
+				break;
+			}
+		}
+
 	}
 
 	/** Change Jet's state and parameters based on input controls **/
@@ -72,7 +108,7 @@ public class WorldController {
 		if (keys.get(Keys.MOVE)) {
 			jet.setState(State.MOVING);
 		}
-		if (!(keys.get(Keys.MOVE))){
+		if (!(keys.get(Keys.MOVE))) {
 			jet.setState(State.IDLE);
 			// acceleration is 0 on the x
 			jet.getAcceleration().x = 0;
