@@ -5,8 +5,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.math.Vector2;
 
 import edu.br.usp.each.si.fsi.ultimate.controller.WorldController;
+import edu.br.usp.each.si.fsi.ultimate.model.Jet;
 import edu.br.usp.each.si.fsi.ultimate.model.World;
 import edu.br.usp.each.si.fsi.ultimate.view.WorldRenderer;
 
@@ -80,15 +82,16 @@ public class GameScreen implements Screen,InputProcessor{
 
 	@Override
 	public boolean touchDown(int x, int y, int pointer, int button) {
-		float jetX = world.getJet().getPosition().x; //* renderer.getPpuX();
-		float jetY = world.getJet().getPosition().y; //* renderer.getPpuY();
-		float newX = renderer.convertPositionX(x);
-		float newY = renderer.convertPositionY(y);
-		float distX = -(jetX - newX);
-		float distY = -(jetY - newY);
-		Gdx.app.debug("Press\nJet","JetX: "+jetX+", JetY: "+jetY+"\nClcX: "+x+", ClcY: "+y
-				+"\nNewX: "+newX+", NewY: "+newY);
-		controller.movePressed(distX,distY);
+		Jet jet = world.getJet();
+		Vector2 click = new Vector2(renderer.convertPositionX(x),renderer.convertPositionY(y));
+		
+		if(click.dst(jet.getPosition().x+jet.getSize()/2,
+				jet.getPosition().y+jet.getSize()/2)<=1F){//TODO
+			Gdx.app.debug("Jet","mover");
+			controller.movePressed(click);//click.x-jet.getSize()/2,click.y-jet.getSize()/2,dst);
+		} else {
+			Gdx.app.debug("Jet","nao mover");
+		}
 		return true;
 	}
 
@@ -100,15 +103,16 @@ public class GameScreen implements Screen,InputProcessor{
 
 	@Override
 	public boolean touchDragged(int x, int y, int pointer) {
-		float jetX = world.getJet().getPosition().x; //* renderer.getPpuX();
-		float jetY = world.getJet().getPosition().y; //* renderer.getPpuY();
-		float newX = renderer.convertPositionX(x);
-		float newY = renderer.convertPositionY(y);
-		float distX = -(jetX - newX);
-		float distY = -(jetY - newY);
-		Gdx.app.debug("Drag\nJet","JetX: "+jetX+", JetY: "+jetY+"\nClcX: "+x+", ClcY: "+y
-				+"\nNewX: "+newX+", NewY: "+newY);
-		controller.movePressed(distX,distY);
+		Jet jet = world.getJet();
+		Vector2 click = new Vector2(renderer.convertPositionX(x),renderer.convertPositionY(y));
+		
+		if(click.dst(jet.getPosition().x+jet.getSize()/2,
+				jet.getPosition().y+jet.getSize()/2)<=1F){//TODO
+			Gdx.app.debug("Jet","mover");
+			controller.movePressed(click);//click.x-jet.getSize()/2,click.y-jet.getSize()/2,dst);
+		} else {
+			Gdx.app.debug("Jet","nao mover");
+		}
 		return true;
 	}
 

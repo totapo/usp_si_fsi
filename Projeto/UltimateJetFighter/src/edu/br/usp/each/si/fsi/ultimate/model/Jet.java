@@ -15,8 +15,6 @@ public class Jet {
 
 	
 	Vector2 position = new Vector2();
-    Vector2 acceleration = new Vector2();
-    Vector2 velocity = new Vector2();
     Rectangle bounds = new Rectangle();
     State state = State.IDLE;
 
@@ -32,6 +30,10 @@ public class Jet {
 	
 	public Vector2 getPosition(){
 		return this.position;
+	}
+	
+	public float getSize(){
+		return SIZE;
 	}
 
 	private boolean facingLeft;
@@ -50,43 +52,6 @@ public class Jet {
 
 	public void update(float delta) {
 		//if(position.x != destination.x)
-		position.add(velocity.cpy().scl(delta));
+		//position.add(velocity.cpy().scl(delta));
 	}
-
-	public Vector2 getVelocity() {
-		return this.velocity;
-	}
-	
-	public Vector2 getAcceleration() {
-		return this.acceleration;
-	}
-
-	public void changeVelocity() {
-		this.velocity.setLength(SPEED);
-	}
-	
-	//GETTERS AND SETTERS
-	/*public float getSpeed(){
-		return this.speed;
-	}
-	
-	public float getSize(){
-		return this.size;
-	}
-	
-	public void setSize(float size){
-		this.size = size;
-	}
-	
-	public void setSpeed(float speed){
-		this.speed = speed;
-	}
-
-	public boolean isFacingLeft() {
-		return facingLeft;
-	}
-
-	public void setFacingLeft(boolean facingLeft) {
-		this.facingLeft = facingLeft;
-	}*/
 }

@@ -89,7 +89,7 @@ public class WorldControllerTest {
 
 	/** Change Jet's state and parameters based on input controls **/
 	private void processInput() {
-		if (keys.get(Keys.LEFT)) {
+		/*if (keys.get(Keys.LEFT)) {
 			// left is pressed
 			jet.setFacingLeft(true);
 			jet.setState(State.MOVING);
@@ -109,6 +109,6 @@ public class WorldControllerTest {
 			jet.getAcceleration().x = 0;
 			// horizontal speed is 0
 			jet.getVelocity().x = 0;
-		}
+		}*/
 	}
 }
