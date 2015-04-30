@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Rectangle;
 
 import edu.br.usp.each.si.fsi.ultimate.model.Block;
+import edu.br.usp.each.si.fsi.ultimate.model.Enemy;
 import edu.br.usp.each.si.fsi.ultimate.model.Jet;
 import edu.br.usp.each.si.fsi.ultimate.model.World;
 
@@ -23,8 +24,9 @@ public class WorldRenderer {
 	ShapeRenderer debugRenderer = new ShapeRenderer();
 
 	/** Textures **/
-	private Texture bobTexture;
+	private Texture jetTexture;
 	private Texture blockTexture;
+	private Texture enemyTexture;
 
 	private SpriteBatch spriteBatch;
 	private boolean debug = false;
@@ -66,16 +68,17 @@ public class WorldRenderer {
 	}
 
 	private void loadTextures() {
-		bobTexture = new  Texture(Gdx.files.internal("images/jet.png"));
+		jetTexture = new  Texture(Gdx.files.internal("images/jet.png"));
 		blockTexture = new Texture(Gdx.files.internal("images/block.png"));
+		enemyTexture = new Texture(Gdx.files.internal("images/enemy.png"));
 	}
 
 	public void render() {
 		spriteBatch.begin();
 			drawBlocks();
 			drawJet();
+			drawEnemies();
 		spriteBatch.end();
-		drawCollisionBlocks();
 		if (debug)
 			drawDebug();
 	}
@@ -85,11 +88,18 @@ public class WorldRenderer {
 			spriteBatch.draw(blockTexture, block.getPosition().x * ppuX, block.getPosition().y * ppuY, Block.SIZE * ppuX, Block.SIZE * ppuY);
 		}
 	}
+	
+	private void drawEnemies() {
+		for (Enemy enemy : world.getEnemies()) {
+			spriteBatch.draw(enemyTexture, enemy.getPosition().x * ppuX, enemy.getPosition().y * ppuY, Enemy.SIZE * ppuX, Enemy.SIZE * ppuY);
+		}
+	}
 
 	private void drawJet() {
 		Jet jet = world.getJet();
-		spriteBatch.draw(bobTexture, jet.getPosition().x * ppuX, jet.getPosition().y * ppuY, Jet.SIZE * ppuX, Jet.SIZE * ppuY);
+		spriteBatch.draw(jetTexture, jet.getPosition().x * ppuX, jet.getPosition().y * ppuY, Jet.SIZE * ppuX, Jet.SIZE * ppuY);
 	}
+	
 
 	private void drawDebug() {
 		// render blocks
@@ -112,14 +122,5 @@ public class WorldRenderer {
 		debugRenderer.end();
 	}
 	
-	private void drawCollisionBlocks() {
-		debugRenderer.setProjectionMatrix(cam.combined);
-		debugRenderer.begin(ShapeType.Filled);
-		debugRenderer.setColor(new Color(1, 1, 1, 1));
-		for (Rectangle rect : world.getCollisionRects()) {
-			debugRenderer.rect(rect.x, rect.y, rect.width, rect.height);
-		}
-		debugRenderer.end();
-		
-	}
+	
 }

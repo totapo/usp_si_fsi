@@ -1,30 +1,32 @@
 package edu.br.usp.each.si.fsi.ultimate.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
 
 public class World {
 
 	/** The blocks making up the world **/
 	ArrayList<Block> blocks = new ArrayList<Block>();
+	/** The enemies that are in the world **/
+	ArrayList<Enemy> enemies = new ArrayList<Enemy>();
 	/** Our player controlled hero **/
 	Jet jet;
 	/** A world has a level through which Bob needs to go through **/
 	Level level;
-	/** The collision boxes **/
-	Array<Rectangle> collisionRects = new Array<Rectangle>();
 
 	// Getters -----------
 
-	public Array<Rectangle> getCollisionRects() {
-		return collisionRects;
-	}
-
 	public ArrayList<Block> getBlocks() {
 		return blocks;
+	}
+
+	public ArrayList<Enemy> getEnemies() {
+		return enemies;
 	}
 
 	public Jet getJet() {
@@ -73,6 +75,41 @@ public class World {
 	private void createDemoWorld() {
 		jet = new Jet(new Vector2(3, 5));
 		level = new Level();
-		this.blocks = getDrawableBlocks(level.getWidth(), level.getHeight());
+		// this.blocks = getDrawableBlocks(level.getWidth(), level.getHeight());
+	}
+
+	public void createEnemies() {
+		if (enemies.isEmpty()) {
+			Random rd = new Random();
+			int nrEnemies = rd.nextInt(level.getHeight());
+			List<Integer> positions = new ArrayList<Integer>();
+			for(int i = 0; i < level.getHeight(); i++){
+				positions.add(i);
+			}
+			
+			
+			while (nrEnemies > 0) {
+				Collections.shuffle(positions);
+				int yPosition = positions.get(0);
+				positions.remove(0);
+				nrEnemies--;
+				Enemy enemy = new Enemy(new Vector2(-2, yPosition));
+				enemies.add(enemy);
+			}
+
+		}
+	}
+
+	public void updateEnemies(float delta) {
+		List<Enemy> rmvEnemies = new ArrayList<Enemy>();
+		for (Enemy enemy : enemies){
+			if (enemy.position.x > level.getWidth())
+				rmvEnemies.add(enemy);
+		}
+		enemies.removeAll(rmvEnemies);
+		for (Enemy enemy : enemies){
+			enemy.update(delta);
+		}
+
 	}
 }

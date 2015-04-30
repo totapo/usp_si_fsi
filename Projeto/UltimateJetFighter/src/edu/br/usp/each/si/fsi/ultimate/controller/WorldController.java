@@ -6,8 +6,8 @@ import java.util.Map;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
-import edu.br.usp.each.si.fsi.ultimate.controller.WorldControllerTest.Keys;
 import edu.br.usp.each.si.fsi.ultimate.model.Block;
+import edu.br.usp.each.si.fsi.ultimate.model.Enemy;
 import edu.br.usp.each.si.fsi.ultimate.model.Jet;
 import edu.br.usp.each.si.fsi.ultimate.model.Jet.State;
 import edu.br.usp.each.si.fsi.ultimate.model.World;
@@ -36,19 +36,19 @@ public class WorldController {
 	// ** Key presses and touches **************** //
 
 	public void movePressed(Vector2 click) {// ,boolean
-																		// xNegative,
-																		// boolean
-																		// yNegative){
+											// xNegative,
+											// boolean
+											// yNegative){
 		/*
 		 * jet.changeVelocity(xNegative, yNegative);
 		 * jet.setDestination(destinationX,destinationY);
-		 
-		jet.getVelocity().set(destinationX, destinationY);
-		jet.getVelocity().setLength(Jet.SPEED);// Não altera a velociade mas
-												// sim a angulacao.
 		 * 
+		 * jet.getVelocity().set(destinationX, destinationY);
+		 * jet.getVelocity().setLength(Jet.SPEED);// Não altera a velociade mas
+		 * // sim a angulacao.
 		 */
-		jet.getPosition().set(click.x-jet.getSize()/2, click.y-jet.getSize()/2);
+		jet.getPosition().set(click.x - jet.getSize() / 2,
+				click.y - jet.getSize() / 2);
 		keys.get(keys.put(Keys.MOVE, true));
 	}
 
@@ -76,13 +76,13 @@ public class WorldController {
 	public void update(float delta) {
 		processInput();
 		checkCollisionWithBlocks(delta);
-		jet.update(delta);
+		checkCollisionWithEnemies(delta);
+		world.updateEnemies(delta);
+		world.createEnemies();
 	}
 
 	/** Collision checking **/
 	private void checkCollisionWithBlocks(float delta) {
-		// scale velocity to frame units
-		//jet.getVelocity().cpy().scl(delta);
 
 		Rectangle jetRect = new Rectangle(jet.getPosition().x,
 				jet.getPosition().y, jet.getBounds().width,
@@ -90,20 +90,41 @@ public class WorldController {
 
 		// if jet collides, make his position (3, 5)
 		for (Block block : world.getBlocks()) {
-			
+
 			if (block == null)
 				continue;
-			else{
+			else {
 				block.getBounds().x = block.getPosition().x;
 				block.getBounds().y = block.getPosition().y;
 			}
 			if (jetRect.overlaps(block.getBounds())) {
 				jet.getPosition().set(new Vector2(3, 5));
-				world.getCollisionRects().add(block.getBounds());
 				break;
 			}
 		}
 
+	}
+
+	private void checkCollisionWithEnemies(float delta) {
+
+		Rectangle jetRect = new Rectangle(jet.getPosition().x,
+				jet.getPosition().y, jet.getBounds().width,
+				jet.getBounds().height);
+
+		// if jet collides, make his position (3, 5)
+		for (Enemy enemy : world.getEnemies()) {
+
+			if (enemy == null)
+				continue;
+			else {
+				enemy.getBounds().x = enemy.getPosition().x;
+				enemy.getBounds().y = enemy.getPosition().y;
+			}
+			if (jetRect.overlaps(enemy.getBounds())) {
+				jet.getPosition().set(new Vector2(3, 5));
+				break;
+			}
+		}
 	}
 
 	/** Change Jet's state and parameters based on input controls **/
