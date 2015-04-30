@@ -35,17 +35,20 @@ public class WorldController {
 
 	// ** Key presses and touches **************** //
 
-	public void movePressed(float destinationX, float destinationY) {// ,boolean
+	public void movePressed(Vector2 click) {// ,boolean
 																		// xNegative,
 																		// boolean
 																		// yNegative){
 		/*
 		 * jet.changeVelocity(xNegative, yNegative);
 		 * jet.setDestination(destinationX,destinationY);
-		 */
+		 
 		jet.getVelocity().set(destinationX, destinationY);
 		jet.getVelocity().setLength(Jet.SPEED);// Não altera a velociade mas
 												// sim a angulacao.
+		 * 
+		 */
+		jet.getPosition().set(click.x-jet.getSize()/2, click.y-jet.getSize()/2);
 		keys.get(keys.put(Keys.MOVE, true));
 	}
 
@@ -79,7 +82,7 @@ public class WorldController {
 	/** Collision checking **/
 	private void checkCollisionWithBlocks(float delta) {
 		// scale velocity to frame units
-		jet.getVelocity().cpy().scl(delta);
+		//jet.getVelocity().cpy().scl(delta);
 
 		Rectangle jetRect = new Rectangle(jet.getPosition().x,
 				jet.getPosition().y, jet.getBounds().width,
@@ -110,14 +113,6 @@ public class WorldController {
 		}
 		if (!(keys.get(Keys.MOVE))) {
 			jet.setState(State.IDLE);
-			// acceleration is 0 on the x
-			jet.getAcceleration().x = 0;
-			// horizontal speed is 0
-			jet.getVelocity().x = 0;
-			// acceleration is 0 on the y
-			jet.getAcceleration().y = 0;
-			// vertical speed is 0
-			jet.getVelocity().y = 0;
 		}
 	}
 }
