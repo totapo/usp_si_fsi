@@ -17,6 +17,9 @@ public class GameScreen implements Screen,InputProcessor{
 	private World 			world;
 	private WorldRenderer renderer;
 	private WorldController	controller;
+	
+	private Jet jet;
+	private Vector2 click;
 	//private int width, height;
 
 	@Override
@@ -24,6 +27,8 @@ public class GameScreen implements Screen,InputProcessor{
 		world = new World();
 		renderer = new WorldRenderer(world, false);
 		controller = new WorldController(world);
+		jet = world.getJet();
+		click=new Vector2();
 		Gdx.input.setInputProcessor(this);
 		Gdx.app.setLogLevel(Application.LOG_DEBUG);
 	}
@@ -82,15 +87,14 @@ public class GameScreen implements Screen,InputProcessor{
 
 	@Override
 	public boolean touchDown(int x, int y, int pointer, int button) {
-		Jet jet = world.getJet();
-		Vector2 click = new Vector2(renderer.convertPositionX(x),renderer.convertPositionY(y));
+		click.set(renderer.convertPositionX(x),renderer.convertPositionY(y));
 		
 		if(click.dst(jet.getPosition().x+jet.getSize()/2,
-				jet.getPosition().y+jet.getSize()/2)<=1F){//TODO
+				jet.getPosition().y+jet.getSize()/2)<=1F){//TODO mudar o raio
 			Gdx.app.debug("Jet","mover");
-			controller.movePressed(click);//click.x-jet.getSize()/2,click.y-jet.getSize()/2,dst);
+			controller.movePressed(click);
 		} else {
-			Gdx.app.debug("Jet","nao mover");
+			Gdx.app.debug("Jet","shoot");
 		}
 		return true;
 	}
@@ -103,13 +107,12 @@ public class GameScreen implements Screen,InputProcessor{
 
 	@Override
 	public boolean touchDragged(int x, int y, int pointer) {
-		Jet jet = world.getJet();
-		Vector2 click = new Vector2(renderer.convertPositionX(x),renderer.convertPositionY(y));
+		click.set(renderer.convertPositionX(x),renderer.convertPositionY(y));
 		
 		if(click.dst(jet.getPosition().x+jet.getSize()/2,
-				jet.getPosition().y+jet.getSize()/2)<=1F){//TODO
+				jet.getPosition().y+jet.getSize()/2)<=1F){//TODO mudar o raio
 			Gdx.app.debug("Jet","mover");
-			controller.movePressed(click);//click.x-jet.getSize()/2,click.y-jet.getSize()/2,dst);
+			controller.movePressed(click);
 		} else {
 			Gdx.app.debug("Jet","nao mover");
 		}
