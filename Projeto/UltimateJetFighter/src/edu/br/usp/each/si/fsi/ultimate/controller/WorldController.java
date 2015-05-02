@@ -78,6 +78,7 @@ public class WorldController {
 		checkCollisionWithBlocks(delta);
 		checkCollisionWithEnemies(delta);
 		world.updateEnemies(delta);
+		world.updateShots(delta);
 		world.createEnemies();
 	}
 

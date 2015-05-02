@@ -1,7 +1,6 @@
 package edu.br.usp.each.si.fsi.ultimate.model;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -16,6 +15,8 @@ public class World {
 	ArrayList<Enemy> enemies = new ArrayList<Enemy>();
 	/** Our player controlled hero **/
 	Jet jet;
+	/** Contains all the shots/bullets that are on screen*/
+	ArrayList<Shot> shots=new ArrayList<Shot>();
 	/** A world has a level through which Bob needs to go through **/
 	Level level;
 
@@ -31,6 +32,10 @@ public class World {
 
 	public Jet getJet() {
 		return jet;
+	}
+	
+	public ArrayList<Shot> getShots(){
+		return this.shots;
 	}
 
 	// --------------------
@@ -71,9 +76,17 @@ public class World {
 	public World() {
 		createDemoWorld();
 	}
+	
+	public void shoot(Object source){
+		if(source instanceof Jet){
+			Shot bullet =  new Shot(((Jet)source).getPosition().cpy(),"");
+			bullet.getPosition().y+=jet.SIZE/2;//((Jet) source).getShot();
+			this.shots.add(bullet);
+		}
+	}
 
 	private void createDemoWorld() {
-		jet = new Jet(new Vector2(3, 5));
+		jet = new Jet(new Vector2(3, 5),new Shot(new Vector2(0,0),"images/shot.png"));
 		level = new Level();
 		// this.blocks = getDrawableBlocks(level.getWidth(), level.getHeight());
 	}
@@ -86,7 +99,6 @@ public class World {
 			for(int i = 0; i < level.getHeight(); i++){
 				positions.add(i);
 			}
-			
 			
 			while (nrEnemies > 0) {
 				Collections.shuffle(positions);
@@ -111,5 +123,17 @@ public class World {
 			enemy.update(delta);
 		}
 
+	}
+	
+	public void updateShots(float delta) {
+		List<Shot> rmvShots = new ArrayList<Shot>();
+		for (Shot shot : shots){
+			if (shot.position.x > level.getWidth() || (shot.position.x < 0))
+				rmvShots.add(shot);
+		}
+		shots.removeAll(rmvShots);
+		for (Shot shot : shots){
+			shot.update(delta);
+		}
 	}
 }

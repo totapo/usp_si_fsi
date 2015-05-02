@@ -1,4 +1,7 @@
 package edu.br.usp.each.si.fsi.ultimate.view;
+import java.util.ArrayList;
+import java.util.Map;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -11,6 +14,7 @@ import com.badlogic.gdx.math.Rectangle;
 import edu.br.usp.each.si.fsi.ultimate.model.Block;
 import edu.br.usp.each.si.fsi.ultimate.model.Enemy;
 import edu.br.usp.each.si.fsi.ultimate.model.Jet;
+import edu.br.usp.each.si.fsi.ultimate.model.Shot;
 import edu.br.usp.each.si.fsi.ultimate.model.World;
 
 public class WorldRenderer {
@@ -34,6 +38,9 @@ public class WorldRenderer {
 	private int height;
 	private float ppuX;	// pixels per unit on the X axis
 	private float ppuY;	// pixels per unit on the Y axis
+	
+	private ArrayList<Shot> auxRemoval;
+	private Texture shotTexture;
 	public void setSize (int w, int h) {
 		this.width = w;
 		this.height = h;
@@ -64,6 +71,7 @@ public class WorldRenderer {
 		this.cam.update();
 		this.debug = debug;
 		spriteBatch = new SpriteBatch();
+		this.auxRemoval = new ArrayList<Shot>();
 		loadTextures();
 	}
 
@@ -71,6 +79,11 @@ public class WorldRenderer {
 		jetTexture = new  Texture(Gdx.files.internal("images/jet.png"));
 		blockTexture = new Texture(Gdx.files.internal("images/block.png"));
 		enemyTexture = new Texture(Gdx.files.internal("images/enemy.png"));
+		shotTexture = new Texture(Gdx.files.internal("images/shot.png"));
+	}
+	
+	private Texture loadShotTexture(Shot shot){
+		return new Texture(Gdx.files.internal(shot.getImgSrc()));
 	}
 
 	public void render() {
@@ -78,6 +91,7 @@ public class WorldRenderer {
 			drawBlocks();
 			drawJet();
 			drawEnemies();
+			drawShots();
 		spriteBatch.end();
 		if (debug)
 			drawDebug();
@@ -98,6 +112,12 @@ public class WorldRenderer {
 	private void drawJet() {
 		Jet jet = world.getJet();
 		spriteBatch.draw(jetTexture, jet.getPosition().x * ppuX, jet.getPosition().y * ppuY, Jet.SIZE * ppuX, Jet.SIZE * ppuY);
+	}
+	
+	private void drawShots(){
+		for(Shot shot:world.getShots()){
+			spriteBatch.draw(shotTexture, shot.getPosition().x * ppuX, shot.getPosition().y * ppuY, Shot.SIZE * ppuX, Shot.SIZE * ppuY);
+		}
 	}
 	
 

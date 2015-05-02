@@ -9,7 +9,7 @@ public class Jet {
 	
 	//private float speed;
 	//private float size;
-	
+	private Shot shot; //TODO pode passar pra shots
 	public static final float SPEED = 4f;  // unit per second
 	public static final float SIZE = 0.5f; // half a unit
 
@@ -18,7 +18,8 @@ public class Jet {
     Rectangle bounds = new Rectangle();
     State state = State.IDLE;
 
-    public Jet(Vector2 position) {
+    public Jet(Vector2 position, Shot shot) {
+    	this.shot = shot;
 		this.position = position;
 		this.bounds.height = SIZE;
 		this.bounds.width = SIZE;
@@ -30,6 +31,10 @@ public class Jet {
 	
 	public Vector2 getPosition(){
 		return this.position;
+	}
+	
+	public Shot getShot(){
+		return new Shot(shot.position,shot.getImgSrc());
 	}
 	
 	public float getSize(){
