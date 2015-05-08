@@ -15,8 +15,10 @@ public class World {
 	ArrayList<Enemy> enemies = new ArrayList<Enemy>();
 	/** Our player controlled hero **/
 	Jet jet;
-	/** Contains all the shots/bullets that are on screen*/
-	ArrayList<Shot> shots=new ArrayList<Shot>();
+	/** Contains all the jet's shots/bullets that are on screen */
+	ArrayList<Shot> jetShots = new ArrayList<Shot>();
+	/** Contains all the enemy's shots/bullets that are on screen */
+	ArrayList<Shot> enemiesShots = new ArrayList<Shot>();
 	/** A world has a level through which Bob needs to go through **/
 	Level level;
 
@@ -33,9 +35,13 @@ public class World {
 	public Jet getJet() {
 		return jet;
 	}
+
+	public ArrayList<Shot> getJetShots() {
+		return this.jetShots;
+	}
 	
-	public ArrayList<Shot> getShots(){
-		return this.shots;
+	public ArrayList<Shot> getEnemiesShots() {
+		return this.enemiesShots;
 	}
 
 	// --------------------
@@ -76,17 +82,18 @@ public class World {
 	public World() {
 		createDemoWorld();
 	}
-	
-	public void shoot(Object source){
-		if(source instanceof Jet){
-			Shot bullet =  new Shot(((Jet)source).getPosition().cpy(),"");
-			bullet.getPosition().y+=jet.SIZE/2;//((Jet) source).getShot();
-			this.shots.add(bullet);
+
+	public void shoot(Object source) {
+		if (source instanceof Jet) {
+			Shot bullet = new Shot(((Jet) source).getPosition().cpy(), "");
+			bullet.getPosition().y += jet.SIZE / 2;// ((Jet) source).getShot();
+			this.jetShots.add(bullet);
 		}
 	}
 
 	private void createDemoWorld() {
-		jet = new Jet(new Vector2(3, 5),new Shot(new Vector2(0,0),"images/shot.png"));
+		jet = new Jet(new Vector2(3, 5), new Shot(new Vector2(0, 0),
+				"images/shot.png"));
 		level = new Level();
 		// this.blocks = getDrawableBlocks(level.getWidth(), level.getHeight());
 	}
@@ -96,10 +103,10 @@ public class World {
 			Random rd = new Random();
 			int nrEnemies = rd.nextInt(level.getHeight());
 			List<Integer> positions = new ArrayList<Integer>();
-			for(int i = 0; i < level.getHeight(); i++){
+			for (int i = 0; i < level.getHeight(); i++) {
 				positions.add(i);
 			}
-			
+
 			while (nrEnemies > 0) {
 				Collections.shuffle(positions);
 				int yPosition = positions.get(0);
@@ -114,25 +121,25 @@ public class World {
 
 	public void updateEnemies(float delta) {
 		List<Enemy> rmvEnemies = new ArrayList<Enemy>();
-		for (Enemy enemy : enemies){
+		for (Enemy enemy : enemies) {
 			if (enemy.position.x > level.getWidth())
 				rmvEnemies.add(enemy);
 		}
 		enemies.removeAll(rmvEnemies);
-		for (Enemy enemy : enemies){
+		for (Enemy enemy : enemies) {
 			enemy.update(delta);
 		}
 
 	}
-	
-	public void updateShots(float delta) {
+
+	public void updateJetShots(float delta) {
 		List<Shot> rmvShots = new ArrayList<Shot>();
-		for (Shot shot : shots){
+		for (Shot shot : jetShots) {
 			if (shot.position.x > level.getWidth() || (shot.position.x < 0))
 				rmvShots.add(shot);
 		}
-		shots.removeAll(rmvShots);
-		for (Shot shot : shots){
+		jetShots.removeAll(rmvShots);
+		for (Shot shot : jetShots) {
 			shot.update(delta);
 		}
 	}

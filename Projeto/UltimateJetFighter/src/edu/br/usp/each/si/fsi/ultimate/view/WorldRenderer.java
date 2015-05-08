@@ -91,7 +91,7 @@ public class WorldRenderer {
 			drawBlocks();
 			drawJet();
 			drawEnemies();
-			drawShots();
+			drawJetShots();
 		spriteBatch.end();
 		if (debug)
 			drawDebug();
@@ -114,8 +114,8 @@ public class WorldRenderer {
 		spriteBatch.draw(jetTexture, jet.getPosition().x * ppuX, jet.getPosition().y * ppuY, Jet.SIZE * ppuX, Jet.SIZE * ppuY);
 	}
 	
-	private void drawShots(){
-		for(Shot shot:world.getShots()){
+	private void drawJetShots(){
+		for(Shot shot:world.getJetShots()){
 			spriteBatch.draw(shotTexture, shot.getPosition().x * ppuX, shot.getPosition().y * ppuY, Shot.SIZE * ppuX, Shot.SIZE * ppuY);
 		}
 	}
