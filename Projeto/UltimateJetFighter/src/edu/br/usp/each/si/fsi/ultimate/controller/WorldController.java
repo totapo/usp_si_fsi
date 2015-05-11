@@ -85,6 +85,7 @@ public class WorldController {
 		world.updateEnemies(delta);
 		world.updateJetShots(delta);
 		world.createEnemies();
+		jet.update(delta);
 	}
 
 	/** Collision checking **/

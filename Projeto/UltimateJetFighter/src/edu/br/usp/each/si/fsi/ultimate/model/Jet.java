@@ -13,7 +13,7 @@ public class Jet {
 	public static final float SPEED = 4f;  // unit per second
 	public static final float SIZE = 0.5f; // half a unit
 	public static final int DAMAGE = 5;
-
+	float stateTime = 0;
 	
 	Vector2 position = new Vector2();
     Rectangle bounds = new Rectangle();
@@ -55,8 +55,13 @@ public class Jet {
 	public void setState(State newState) {
 		this.state = newState;
 	}
+	
+	public float getStateTime() {
+		return stateTime;
+	}
 
 	public void update(float delta) {
+		stateTime += delta;
 		//if(position.x != destination.x)
 		//position.add(velocity.cpy().scl(delta));
 	}

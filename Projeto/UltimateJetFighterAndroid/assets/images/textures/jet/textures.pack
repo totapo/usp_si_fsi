@@ -1,0 +1,33 @@
+
+textures.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+jet1
+  rotate: false
+  xy: 1, 1
+  size: 54, 36
+  orig: 54, 36
+  offset: 0, 0
+  index: -1
+jet2
+  rotate: false
+  xy: 57, 1
+  size: 54, 36
+  orig: 54, 36
+  offset: 0, 0
+  index: -1
+jet3
+  rotate: false
+  xy: 113, 1
+  size: 54, 36
+  orig: 54, 36
+  offset: 0, 0
+  index: -1
+jet4
+  rotate: false
+  xy: 169, 1
+  size: 54, 36
+  orig: 54, 36
+  offset: 0, 0
+  index: -1

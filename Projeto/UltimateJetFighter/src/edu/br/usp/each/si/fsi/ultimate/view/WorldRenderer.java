@@ -1,15 +1,21 @@
 package edu.br.usp.each.si.fsi.ultimate.view;
+
 import java.util.ArrayList;
 import java.util.Map;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.SharedLibraryLoader;
 
 import edu.br.usp.each.si.fsi.ultimate.model.Block;
 import edu.br.usp.each.si.fsi.ultimate.model.Enemy;
@@ -20,9 +26,12 @@ import edu.br.usp.each.si.fsi.ultimate.model.World;
 public class WorldRenderer {
 	private static final float CAMERA_WIDTH = 10f;
 	private static final float CAMERA_HEIGHT = 7f;
-
+	private static final float RUNNING_FRAME_DURATION = 0.06f;
+	
 	private World world;
 	private OrthographicCamera cam;
+	
+	
 
 	/** for debug rendering **/
 	ShapeRenderer debugRenderer = new ShapeRenderer();
@@ -36,32 +45,37 @@ public class WorldRenderer {
 	private boolean debug = false;
 	private int width;
 	private int height;
-	private float ppuX;	// pixels per unit on the X axis
-	private float ppuY;	// pixels per unit on the Y axis
+	private float ppuX; // pixels per unit on the X axis
+	private float ppuY; // pixels per unit on the Y axis
 	
+	//animations
+	private Animation jetAnimation;
+
 	private ArrayList<Shot> auxRemoval;
 	private Texture shotTexture;
-	public void setSize (int w, int h) {
+	private TextureRegion jetFrame;
+
+	public void setSize(int w, int h) {
 		this.width = w;
 		this.height = h;
-		ppuX = (float)width / CAMERA_WIDTH;
-		ppuY = (float)height / CAMERA_HEIGHT;
+		ppuX = (float) width / CAMERA_WIDTH;
+		ppuY = (float) height / CAMERA_HEIGHT;
 	}
-	
-	public float getPpuX(){
+
+	public float getPpuX() {
 		return ppuX;
 	}
-	
-	public float getPpuY(){
+
+	public float getPpuY() {
 		return ppuY;
 	}
-	
-	public float convertPositionX(int x){
-		return (float)x/ppuX;
+
+	public float convertPositionX(int x) {
+		return (float) x / ppuX;
 	}
-	
-	public float convertPositionY(int y){
-		return (float)(height-y)/ppuY;
+
+	public float convertPositionY(int y) {
+		return (float) (height - y) / ppuY;
 	}
 
 	public WorldRenderer(World world, boolean debug) {
@@ -72,26 +86,38 @@ public class WorldRenderer {
 		this.debug = debug;
 		spriteBatch = new SpriteBatch();
 		this.auxRemoval = new ArrayList<Shot>();
+		loadJetAnimations();
 		loadTextures();
 	}
 
 	private void loadTextures() {
-		jetTexture = new  Texture(Gdx.files.internal("images/jet.png"));
+		jetTexture = new Texture(Gdx.files.internal("images/sprites/jet/jet.png"));
 		blockTexture = new Texture(Gdx.files.internal("images/block.png"));
-		enemyTexture = new Texture(Gdx.files.internal("images/enemy.png"));
+		enemyTexture = new Texture(Gdx.files.internal("images/sprites/enemy/enemy.png"));
 		shotTexture = new Texture(Gdx.files.internal("images/shot.png"));
+		
 	}
 	
-	private Texture loadShotTexture(Shot shot){
+	//load the jet animation
+	private void loadJetAnimations(){
+		TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("images/textures/jet/textures.pack"));
+		TextureRegion[] animationFrames = new TextureRegion[4];
+		for (int i = 1; i < 5; i++) {
+			animationFrames[i - 1] = atlas.findRegion("jet" + i);
+		}
+		jetAnimation = new Animation(RUNNING_FRAME_DURATION, animationFrames);
+	}
+
+	private Texture loadShotTexture(Shot shot) {
 		return new Texture(Gdx.files.internal(shot.getImgSrc()));
 	}
 
 	public void render() {
 		spriteBatch.begin();
-			drawBlocks();
-			drawJet();
-			drawEnemies();
-			drawJetShots();
+		drawBlocks();
+		drawJet();
+		drawEnemies();
+		drawJetShots();
 		spriteBatch.end();
 		if (debug)
 			drawDebug();
@@ -99,27 +125,34 @@ public class WorldRenderer {
 
 	private void drawBlocks() {
 		for (Block block : world.getBlocks()) {
-			spriteBatch.draw(blockTexture, block.getPosition().x * ppuX, block.getPosition().y * ppuY, Block.SIZE * ppuX, Block.SIZE * ppuY);
+			spriteBatch.draw(blockTexture, block.getPosition().x * ppuX,
+					block.getPosition().y * ppuY, Block.SIZE * ppuX, Block.SIZE
+							* ppuY);
 		}
 	}
-	
+
 	private void drawEnemies() {
 		for (Enemy enemy : world.getEnemies()) {
-			spriteBatch.draw(enemyTexture, enemy.getPosition().x * ppuX, enemy.getPosition().y * ppuY, Enemy.SIZE * ppuX, Enemy.SIZE * ppuY);
+			spriteBatch.draw(enemyTexture, enemy.getPosition().x * ppuX,
+					enemy.getPosition().y * ppuY, Enemy.SIZE * ppuX, Enemy.SIZE
+							* ppuY);
 		}
 	}
 
 	private void drawJet() {
 		Jet jet = world.getJet();
-		spriteBatch.draw(jetTexture, jet.getPosition().x * ppuX, jet.getPosition().y * ppuY, Jet.SIZE * ppuX, Jet.SIZE * ppuY);
+		jetFrame = jetAnimation.getKeyFrame(jet.getStateTime(), true);
+		spriteBatch.draw(jetFrame, jet.getPosition().x * ppuX,
+				jet.getPosition().y * ppuY, Jet.SIZE * ppuX, Jet.SIZE * ppuY);
 	}
-	
-	private void drawJetShots(){
-		for(Shot shot:world.getJetShots()){
-			spriteBatch.draw(shotTexture, shot.getPosition().x * ppuX, shot.getPosition().y * ppuY, Shot.SIZE * ppuX, Shot.SIZE * ppuY);
+
+	private void drawJetShots() {
+		for (Shot shot : world.getJetShots()) {
+			spriteBatch.draw(shotTexture, shot.getPosition().x * ppuX,
+					shot.getPosition().y * ppuY, Shot.SIZE * ppuX, Shot.SIZE
+							* ppuY);
 		}
 	}
-	
 
 	private void drawDebug() {
 		// render blocks
@@ -132,7 +165,7 @@ public class WorldRenderer {
 			debugRenderer.setColor(new Color(1, 0, 0, 1));
 			debugRenderer.rect(x1, y1, rect.width, rect.height);
 		}
-		// render Bob
+		// render jet
 		Jet jet = world.getJet();
 		Rectangle rect = jet.getBounds();
 		float x1 = jet.getPosition().x + rect.x;
@@ -141,6 +174,5 @@ public class WorldRenderer {
 		debugRenderer.rect(x1, y1, rect.width, rect.height);
 		debugRenderer.end();
 	}
-	
-	
+
 }
