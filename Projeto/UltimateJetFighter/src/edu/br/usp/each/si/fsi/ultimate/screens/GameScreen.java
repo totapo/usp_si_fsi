@@ -12,15 +12,16 @@ import edu.br.usp.each.si.fsi.ultimate.model.Jet;
 import edu.br.usp.each.si.fsi.ultimate.model.World;
 import edu.br.usp.each.si.fsi.ultimate.view.WorldRenderer;
 
-public class GameScreen implements Screen,InputProcessor{
+public class GameScreen implements Screen, InputProcessor {
 
-	private World 			world;
+	private World world;
 	private WorldRenderer renderer;
-	private WorldController	controller;
-	
+	private WorldController controller;
+
 	private Jet jet;
 	private Vector2 click;
-	//private int width, height;
+
+	// private int width, height;
 
 	@Override
 	public void show() {
@@ -28,7 +29,7 @@ public class GameScreen implements Screen,InputProcessor{
 		renderer = new WorldRenderer(world, false);
 		controller = new WorldController(world);
 		jet = world.getJet();
-		click=new Vector2();
+		click = new Vector2();
 		Gdx.input.setInputProcessor(this);
 		Gdx.app.setLogLevel(Application.LOG_DEBUG);
 	}
@@ -87,17 +88,26 @@ public class GameScreen implements Screen,InputProcessor{
 
 	@Override
 	public boolean touchDown(int x, int y, int pointer, int button) {
-		click.set(renderer.convertPositionX(x),renderer.convertPositionY(y));
-		
-		if(click.dst(jet.getPosition().x+jet.getSize()/2,
-				jet.getPosition().y+jet.getSize()/2)<=1F){//TODO mudar o raio
-			Gdx.app.debug("Jet","mover");
-			controller.movePressed(click);
+		if (jet.getState() != Jet.State.DYING) {
+			click.set(renderer.convertPositionX(x),
+					renderer.convertPositionY(y));
+
+			if (click.dst(jet.getPosition().x + jet.getSize() / 2,
+					jet.getPosition().y + jet.getSize() / 2) <= 1F) {// TODO
+																		// mudar
+																		// o
+																		// raio
+				Gdx.app.debug("Jet", "mover");
+				controller.movePressed(click);
+			} else {
+				Gdx.app.debug("Jet", "shoot");
+				world.shoot(jet);
+			}
+			return true;
 		} else {
-			Gdx.app.debug("Jet","shoot");
-			world.shoot(jet);
+			return false;
 		}
-		return true;
+
 	}
 
 	@Override
@@ -108,16 +118,24 @@ public class GameScreen implements Screen,InputProcessor{
 
 	@Override
 	public boolean touchDragged(int x, int y, int pointer) {
-		click.set(renderer.convertPositionX(x),renderer.convertPositionY(y));
-		
-		if(click.dst(jet.getPosition().x+jet.getSize()/2,
-				jet.getPosition().y+jet.getSize()/2)<=1F){//TODO mudar o raio
-			Gdx.app.debug("Jet","mover");
-			controller.movePressed(click);
+		if (jet.getState() != Jet.State.DYING) {
+			click.set(renderer.convertPositionX(x),
+					renderer.convertPositionY(y));
+
+			if (click.dst(jet.getPosition().x + jet.getSize() / 2,
+					jet.getPosition().y + jet.getSize() / 2) <= 1F) {// TODO
+																		// mudar
+																		// o
+																		// raio
+				Gdx.app.debug("Jet", "mover");
+				controller.movePressed(click);
+			} else {
+				Gdx.app.debug("Jet", "nao mover");
+			}
+			return true;
 		} else {
-			Gdx.app.debug("Jet","nao mover");
+			return false;
 		}
-		return true;
 	}
 
 	@Override

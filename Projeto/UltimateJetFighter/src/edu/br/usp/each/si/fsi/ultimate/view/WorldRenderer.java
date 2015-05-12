@@ -1,6 +1,7 @@
 package edu.br.usp.each.si.fsi.ultimate.view;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import com.badlogic.gdx.Gdx;
@@ -15,10 +16,12 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.SharedLibraryLoader;
 
 import edu.br.usp.each.si.fsi.ultimate.model.Block;
 import edu.br.usp.each.si.fsi.ultimate.model.Enemy;
+import edu.br.usp.each.si.fsi.ultimate.model.Enemy.State;
 import edu.br.usp.each.si.fsi.ultimate.model.Jet;
 import edu.br.usp.each.si.fsi.ultimate.model.Shot;
 import edu.br.usp.each.si.fsi.ultimate.model.World;
@@ -26,12 +29,11 @@ import edu.br.usp.each.si.fsi.ultimate.model.World;
 public class WorldRenderer {
 	private static final float CAMERA_WIDTH = 10f;
 	private static final float CAMERA_HEIGHT = 7f;
-	private static final float RUNNING_FRAME_DURATION = 0.06f;
-	
+	private static final float JET_FRAME_DURATION = 0.06f;
+	private static final float EXPLOSION_FRAME_DURATION = 0.05f;
+
 	private World world;
 	private OrthographicCamera cam;
-	
-	
 
 	/** for debug rendering **/
 	ShapeRenderer debugRenderer = new ShapeRenderer();
@@ -47,13 +49,17 @@ public class WorldRenderer {
 	private int height;
 	private float ppuX; // pixels per unit on the X axis
 	private float ppuY; // pixels per unit on the Y axis
-	
-	//animations
+
+	// animations
 	private Animation jetAnimation;
+	private Animation deathAnimation;
 
 	private ArrayList<Shot> auxRemoval;
 	private Texture shotTexture;
+
+	// frames for animations
 	private TextureRegion jetFrame;
+	private TextureRegion enemyFrame;
 
 	public void setSize(int w, int h) {
 		this.width = w;
@@ -87,25 +93,41 @@ public class WorldRenderer {
 		spriteBatch = new SpriteBatch();
 		this.auxRemoval = new ArrayList<Shot>();
 		loadJetAnimations();
+		loadDeathAnimations();
 		loadTextures();
 	}
 
 	private void loadTextures() {
-		jetTexture = new Texture(Gdx.files.internal("images/sprites/jet/jet.png"));
+		jetTexture = new Texture(
+				Gdx.files.internal("images/sprites/jet/jet.png"));
 		blockTexture = new Texture(Gdx.files.internal("images/block.png"));
-		enemyTexture = new Texture(Gdx.files.internal("images/sprites/enemy/enemy.png"));
+		enemyTexture = new Texture(
+				Gdx.files.internal("images/sprites/enemy/enemy.png"));
 		shotTexture = new Texture(Gdx.files.internal("images/shot.png"));
-		
+
 	}
-	
-	//load the jet animation
-	private void loadJetAnimations(){
-		TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("images/textures/jet/textures.pack"));
+
+	// load the jet animation
+	private void loadJetAnimations() {
+		TextureAtlas atlas = new TextureAtlas(
+				Gdx.files.internal("images/textures/jet/textures.pack"));
 		TextureRegion[] animationFrames = new TextureRegion[4];
 		for (int i = 1; i < 5; i++) {
 			animationFrames[i - 1] = atlas.findRegion("jet" + i);
 		}
-		jetAnimation = new Animation(RUNNING_FRAME_DURATION, animationFrames);
+		jetAnimation = new Animation(JET_FRAME_DURATION, animationFrames);
+	}
+
+	// load the explosion animation
+	private void loadDeathAnimations() {
+		TextureAtlas atlas = new TextureAtlas(
+				Gdx.files.internal("images/textures/effects/textures.pack"));
+		TextureRegion[] animationFrames = new TextureRegion[4];
+		for (int i = 1; i < 5; i++) {
+			animationFrames[i - 1] = atlas.findRegion("explosion" + i);
+		}
+		deathAnimation = new Animation(EXPLOSION_FRAME_DURATION,
+				animationFrames);
 	}
 
 	private Texture loadShotTexture(Shot shot) {
@@ -132,16 +154,39 @@ public class WorldRenderer {
 	}
 
 	private void drawEnemies() {
+		List<Enemy> enemiesDead = new ArrayList<Enemy>();
 		for (Enemy enemy : world.getEnemies()) {
-			spriteBatch.draw(enemyTexture, enemy.getPosition().x * ppuX,
-					enemy.getPosition().y * ppuY, Enemy.SIZE * ppuX, Enemy.SIZE
-							* ppuY);
+			if (enemy.getState() == Enemy.State.DYING) {
+				enemyFrame = deathAnimation.getKeyFrame(enemy.getStateTime(),
+						true);
+
+				spriteBatch.draw(enemyFrame, enemy.getPosition().x * ppuX,
+						enemy.getPosition().y * ppuY, Enemy.SIZE * ppuX,
+						Enemy.SIZE * ppuY);
+				if (deathAnimation.isAnimationFinished(enemy.getStateTime())) {
+					enemiesDead.add(enemy);
+				}
+
+			} else {
+				spriteBatch.draw(enemyTexture, enemy.getPosition().x * ppuX,
+						enemy.getPosition().y * ppuY, Enemy.SIZE * ppuX,
+						Enemy.SIZE * ppuY);
+			}
 		}
+		world.getEnemies().removeAll(enemiesDead);
 	}
 
 	private void drawJet() {
 		Jet jet = world.getJet();
-		jetFrame = jetAnimation.getKeyFrame(jet.getStateTime(), true);
+		if (jet.getState() != Jet.State.DYING) {
+			jetFrame = jetAnimation.getKeyFrame(jet.getStateTime(), true);
+		}else{
+			jetFrame = deathAnimation.getKeyFrame(jet.getStateTime(), true);
+			if(deathAnimation.isAnimationFinished(jet.getStateTime())){
+				jet.setState(Jet.State.IDLE);
+				jet.getPosition().set(new Vector2(9, 3));
+			}
+		}
 		spriteBatch.draw(jetFrame, jet.getPosition().x * ppuX,
 				jet.getPosition().y * ppuY, Jet.SIZE * ppuX, Jet.SIZE * ppuY);
 	}
