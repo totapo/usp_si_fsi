@@ -50,8 +50,12 @@ public class WorldController {
 		 * jet.getVelocity().setLength(Jet.SPEED);// Não altera a velociade mas
 		 * // sim a angulacao.
 		 */
-		jet.getPosition().set(click.x - jet.getSize() / 2,
-				click.y - jet.getSize() / 2);
+		float x = ((click.x - jet.getSize() / 2)-1);
+		if(x<0) x=0;
+		float y = click.y - jet.getSize() / 2;
+		if(y<0) y=0;
+		else if(y+jet.getSize()/2>7-jet.getSize()/2) y=7-jet.getSize();//6+jet.getSize()/2;
+		jet.getPosition().set(x,y);
 		keys.get(keys.put(Keys.MOVE, true));
 	}
 

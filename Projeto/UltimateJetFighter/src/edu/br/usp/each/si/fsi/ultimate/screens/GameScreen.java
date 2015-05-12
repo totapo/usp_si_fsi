@@ -92,7 +92,8 @@ public class GameScreen implements Screen, InputProcessor {
 			click.set(renderer.convertPositionX(x),
 					renderer.convertPositionY(y));
 
-			if (click.dst(jet.getPosition().x + jet.getSize() / 2,
+			if (click.dst((jet.getPosition().x + jet.getSize() / 2
+					)+1F,
 					jet.getPosition().y + jet.getSize() / 2) <= 1F) {// TODO
 																		// mudar
 																		// o
@@ -122,7 +123,7 @@ public class GameScreen implements Screen, InputProcessor {
 			click.set(renderer.convertPositionX(x),
 					renderer.convertPositionY(y));
 
-			if (click.dst(jet.getPosition().x + jet.getSize() / 2,
+			if (click.dst((jet.getPosition().x + jet.getSize() / 2)+1F,
 					jet.getPosition().y + jet.getSize() / 2) <= 1F) {// TODO
 																		// mudar
 																		// o

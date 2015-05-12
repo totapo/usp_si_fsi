@@ -86,7 +86,7 @@ public class World {
 	public void shoot(Object source) {
 		if (source instanceof Jet) {
 			Shot bullet = new Shot(((Jet) source).getPosition().cpy(), "");
-			bullet.getPosition().y += jet.SIZE / 2;// ((Jet) source).getShot();
+			bullet.getPosition().y += jet.getSize() / 2 - bullet.getSize()/2;// ((Jet) source).getShot();
 			this.jetShots.add(bullet);
 		}
 	}
