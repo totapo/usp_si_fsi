@@ -19,6 +19,8 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.SharedLibraryLoader;
 
+import edu.br.usp.each.si.fsi.ultimate.Numbers;
+import edu.br.usp.each.si.fsi.ultimate.controller.WorldController;
 import edu.br.usp.each.si.fsi.ultimate.model.Block;
 import edu.br.usp.each.si.fsi.ultimate.model.Enemy;
 import edu.br.usp.each.si.fsi.ultimate.model.Enemy.State;
@@ -44,6 +46,8 @@ public class WorldRenderer {
 	private Texture enemyTexture;
 
 	private SpriteBatch spriteBatch;
+	private SpriteBatch hudBatch;
+	private Numbers num;
 	private boolean debug = false;
 	private int width;
 	private int height;
@@ -60,6 +64,8 @@ public class WorldRenderer {
 	// frames for animations
 	private TextureRegion jetFrame;
 	private TextureRegion enemyFrame;
+	
+	float time;
 
 	public void setSize(int w, int h) {
 		this.width = w;
@@ -86,11 +92,13 @@ public class WorldRenderer {
 
 	public WorldRenderer(World world, boolean debug) {
 		this.world = world;
+		time=0;
 		this.cam = new OrthographicCamera(CAMERA_WIDTH, CAMERA_HEIGHT);
 		this.cam.position.set(CAMERA_WIDTH / 2f, CAMERA_HEIGHT / 2f, 0);
 		this.cam.update();
 		this.debug = debug;
 		spriteBatch = new SpriteBatch();
+		this.hudBatch = new SpriteBatch();
 		this.auxRemoval = new ArrayList<Shot>();
 		loadJetAnimations();
 		loadDeathAnimations();
@@ -143,6 +151,46 @@ public class WorldRenderer {
 		spriteBatch.end();
 		if (debug)
 			drawDebug();
+		this.hudBatch.begin();
+		drawHud();
+		this.hudBatch.end();
+	}
+	
+	private void drawHud(){
+		hudBatch.draw(enemyTexture, 0.1f * ppuX,
+					0.1f * ppuY, Enemy.SIZE * ppuX, Enemy.SIZE
+							* ppuY);
+		hudBatch.draw(num.DDOTS.getTexture(),(0.1f)* ppuX,
+				Enemy.SIZE * ppuY, Enemy.SIZE * ppuX, Enemy.SIZE
+				* ppuY);
+		int kills = world.getKillCount();
+		int[] positions=new int[(kills+"").length()];
+		for(int i=positions.length-1;i>-1;i--){
+			positions[i]=kills%10;
+			kills = kills/10;
+		}
+		float aux=Enemy.SIZE+Enemy.SIZE/2;
+		for(int a : positions){
+			hudBatch.draw(Numbers.values()[a].getTexture(), 0.1f * ppuX,
+					aux * ppuY, Enemy.SIZE * ppuX, Enemy.SIZE
+							* ppuY);
+			aux+=Enemy.SIZE/2;
+		}
+		/*time += Gdx.graphics.getRawDeltaTime();
+		int minutes = ((int)time) / 60;
+	    int seconds = ((int)time) % 60;
+	    positions=new int[(minutes+"").length()];
+		aux = positions.length * Enemy.SIZE/2;
+		for(int a : positions){
+			hudBatch.draw(Numbers.values()[a].getTexture(), 0.1f * ppuX,
+					(aux-7) * ppuY, Enemy.SIZE * ppuX, Enemy.SIZE
+							* ppuY);
+			aux+=Enemy.SIZE/2;
+		}
+		hudBatch.draw(num.DDOTS.getTexture(),(0.1f)* ppuX,
+				Enemy.SIZE * ppuY, Enemy.SIZE * ppuX, Enemy.SIZE
+				* ppuY);*/
+		
 	}
 
 	private void drawBlocks() {

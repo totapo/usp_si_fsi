@@ -35,6 +35,7 @@ public class WorldController {
 		this.world = world;
 		this.jet = world.getJet();
 	}
+	
 
 	// ** Key presses and touches **************** //
 
@@ -183,6 +184,7 @@ public class WorldController {
 					if (enemy.getHp() <= 0) {
 						enemy.setState(Enemy.State.DYING);
 						enemy.setStateTime(0);
+						world.setKillCount(world.getKillCount()+1);
 					}
 
 					break;

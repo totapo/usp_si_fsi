@@ -1,11 +1,13 @@
 package edu.br.usp.each.si.fsi.ultimate.model;
 
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Timer;
 
 public class World {
 
@@ -21,6 +23,8 @@ public class World {
 	ArrayList<Shot> enemiesShots = new ArrayList<Shot>();
 	/** A world has a level through which Bob needs to go through **/
 	Level level;
+	/** Player Kill count*/
+	int killCount;
 
 	// Getters -----------
 
@@ -34,6 +38,14 @@ public class World {
 
 	public Jet getJet() {
 		return jet;
+	}
+	
+	public int getKillCount(){
+		return this.killCount;
+	};
+	
+	public void setKillCount(int n){
+		this.killCount=n;
 	}
 
 	public ArrayList<Shot> getJetShots() {
@@ -80,6 +92,7 @@ public class World {
 
 	// --------------------
 	public World() {
+		this.killCount=0;
 		createDemoWorld();
 	}
 
