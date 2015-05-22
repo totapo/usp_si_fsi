@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
@@ -35,7 +36,6 @@ public class WorldController {
 		this.world = world;
 		this.jet = world.getJet();
 	}
-	
 
 	// ** Key presses and touches **************** //
 
@@ -51,12 +51,15 @@ public class WorldController {
 		 * jet.getVelocity().setLength(Jet.SPEED);// Não altera a velociade mas
 		 * // sim a angulacao.
 		 */
-		float x = ((click.x - jet.getSize() / 2)-1);
-		if(x<0) x=0;
+		float x = ((click.x - jet.getSize() / 2) - 1);
+		if (x < 0)
+			x = 0;
 		float y = click.y - jet.getSize() / 2;
-		if(y<0) y=0;
-		else if(y+jet.getSize()/2>7-jet.getSize()/2) y=7-jet.getSize();//6+jet.getSize()/2;
-		jet.getPosition().set(x,y);
+		if (y < 0)
+			y = 0;
+		else if (y + jet.getSize() / 2 > 7 - jet.getSize() / 2)
+			y = 7 - jet.getSize();// 6+jet.getSize()/2;
+		jet.getPosition().set(x, y);
 		keys.get(keys.put(Keys.MOVE, true));
 	}
 
@@ -87,6 +90,7 @@ public class WorldController {
 		checkCollisionWithEnemies(delta);
 		checkCollisionWithBullets(delta);
 		killEnemies(delta);
+		artificialIntelligence(delta);
 		world.updateEnemies(delta);
 		world.updateJetShots(delta);
 		world.createEnemies();
@@ -184,7 +188,7 @@ public class WorldController {
 					if (enemy.getHp() <= 0) {
 						enemy.setState(Enemy.State.DYING);
 						enemy.setStateTime(0);
-						world.setKillCount(world.getKillCount()+1);
+						world.setKillCount(world.getKillCount() + 1);
 					}
 
 					break;
@@ -194,11 +198,24 @@ public class WorldController {
 		world.getJetShots().removeAll(shotsHit);
 	}
 
+	public void artificialIntelligence(float delta) {
+		for (Enemy enemy : world.getEnemies()) {
+			
+			// Setting initial vertical acceleration
+			enemy.getVelocity().x = Enemy.SPEED;
+			enemy.getVelocity().y = enemy.getyDirection();
+			// Convert acceleration to frame time
+
+			// apply acceleration to change velocity
+			enemy.getPosition().add(enemy.getVelocity());
+			Gdx.app.debug("enemy", enemy.getPosition().x+","+enemy.getPosition().y);
+		}
+	}
+
 	/** Change Jet's state and parameters based on input controls **/
 	private void processInput() {
 		if (jet.getState() != Jet.State.DYING) {
 			if (keys.get(Keys.MOVE)) {
-
 				jet.setState(State.MOVING);
 			}
 			if (!(keys.get(Keys.MOVE))) {

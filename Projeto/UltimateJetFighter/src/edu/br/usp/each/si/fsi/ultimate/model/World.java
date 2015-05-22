@@ -23,7 +23,7 @@ public class World {
 	ArrayList<Shot> enemiesShots = new ArrayList<Shot>();
 	/** A world has a level through which Bob needs to go through **/
 	Level level;
-	/** Player Kill count*/
+	/** Player Kill count */
 	int killCount;
 
 	// Getters -----------
@@ -39,19 +39,19 @@ public class World {
 	public Jet getJet() {
 		return jet;
 	}
-	
-	public int getKillCount(){
+
+	public int getKillCount() {
 		return this.killCount;
 	};
-	
-	public void setKillCount(int n){
-		this.killCount=n;
+
+	public void setKillCount(int n) {
+		this.killCount = n;
 	}
 
 	public ArrayList<Shot> getJetShots() {
 		return this.jetShots;
 	}
-	
+
 	public ArrayList<Shot> getEnemiesShots() {
 		return this.enemiesShots;
 	}
@@ -92,14 +92,15 @@ public class World {
 
 	// --------------------
 	public World() {
-		this.killCount=0;
+		this.killCount = 0;
 		createDemoWorld();
 	}
 
 	public void shoot(Object source) {
 		if (source instanceof Jet) {
 			Shot bullet = new Shot(((Jet) source).getPosition().cpy(), "");
-			bullet.getPosition().y += jet.getSize() / 2 - bullet.getSize()/2;// ((Jet) source).getShot();
+			bullet.getPosition().y += jet.getSize() / 2 - bullet.getSize() / 2;// ((Jet)
+																				// source).getShot();
 			this.jetShots.add(bullet);
 		}
 	}
@@ -120,22 +121,33 @@ public class World {
 				positions.add(i);
 			}
 
+			float yDirection;
+			boolean isDirectionRight = rd.nextBoolean();
+			if (isDirectionRight) {
+				yDirection = ((float) rd.nextInt(200)) / 10000;
+			} else {
+				yDirection = -((float) rd.nextInt(200)) / 10000;
+			}
 			while (nrEnemies > 0) {
 				Collections.shuffle(positions);
 				int yPosition = positions.get(0);
 				positions.remove(0);
 				nrEnemies--;
+
 				Enemy enemy = new Enemy(new Vector2(-2, yPosition));
+				enemy.setyDirection(yDirection);
+
 				enemies.add(enemy);
 			}
 
 		}
+
 	}
 
 	public void updateEnemies(float delta) {
 		List<Enemy> rmvEnemies = new ArrayList<Enemy>();
 		for (Enemy enemy : enemies) {
-			if (enemy.position.x > level.getWidth())
+			if (enemy.position.x > level.getWidth() || enemy.position.y + enemy.getSize() < 0 || enemy.position.y - enemy.getSize() > level.getHeight())
 				rmvEnemies.add(enemy);
 		}
 		enemies.removeAll(rmvEnemies);

@@ -14,13 +14,15 @@ public class Enemy {
 	
 
 	double hp;
+	
+	float yDirection;
 	Vector2 position = new Vector2();
 	Rectangle bounds = new Rectangle();
 	Vector2 velocity = new Vector2();
-	State state = State.MOVING;
-
+	Vector2 acceleration = new Vector2();
 	
 
+	State state = State.MOVING;
 
 	public Enemy(Vector2 position) {
 		this.position = position;
@@ -45,6 +47,14 @@ public class Enemy {
 	public Vector2 getPosition() {
 		return this.position;
 	}
+	
+	public Vector2 getAcceleration() {
+		return acceleration;
+	}
+	
+	public Vector2 getVelocity() {
+		return velocity;
+	}
 
 	public float getSize() {
 		return SIZE;
@@ -66,10 +76,19 @@ public class Enemy {
 	public void setStateTime(float stateTime) {
 		this.stateTime = stateTime;
 	}
+	
+	public void setyDirection(float yDirection) {
+		this.yDirection = yDirection;
+	}
+
+	public float getyDirection() {
+		return yDirection;
+	}
+	
 
 	public void update(float delta) {
 		stateTime += delta;
-		position.x += SPEED;
 		position.add(velocity.cpy().scl(delta));
+		
 	}
 }
