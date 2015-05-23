@@ -1,13 +1,17 @@
 package edu.br.usp.each.si.fsi.ultimate.model;
 
+
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 public class Enemy {
 	
 	public enum State{MOVING,DYING};
+	public enum EnemyType{NORMAL, SPECIAL};
 
-	public static final float SPEED = 0.02f; // unit per second
+	public static final float NORMAL_SPEED = 0.02f; // unit per second
+	public static final float SPECIAL_SPEED = 0.01f; // unit per second
+	public static final float SPECIAL_ACCELERATION = 0.05f; // unit per second
 	public static final float SIZE = 0.5f; // half a unit
 	public static final int HP = 10;
 	float stateTime = 0;
@@ -23,6 +27,10 @@ public class Enemy {
 	
 
 	State state = State.MOVING;
+	EnemyType type = EnemyType.NORMAL;
+
+	
+
 
 	public Enemy(Vector2 position) {
 		this.position = position;
@@ -83,6 +91,15 @@ public class Enemy {
 
 	public float getyDirection() {
 		return yDirection;
+	}
+	
+	public EnemyType getType() {
+		return type;
+	}
+
+
+	public void setType(EnemyType type) {
+		this.type = type;
 	}
 	
 

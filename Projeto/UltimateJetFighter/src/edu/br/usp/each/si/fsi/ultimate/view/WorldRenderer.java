@@ -44,6 +44,7 @@ public class WorldRenderer {
 	private Texture jetTexture;
 	private Texture blockTexture;
 	private Texture enemyTexture;
+	private Texture specialEnemyTexture;
 
 	private SpriteBatch spriteBatch;
 	private SpriteBatch hudBatch;
@@ -111,6 +112,8 @@ public class WorldRenderer {
 		blockTexture = new Texture(Gdx.files.internal("images/block.png"));
 		enemyTexture = new Texture(
 				Gdx.files.internal("images/sprites/enemy/enemy.png"));
+		specialEnemyTexture = new Texture(
+				Gdx.files.internal("images/specialEnemy.png"));
 		shotTexture = new Texture(Gdx.files.internal("images/shot.png"));
 
 	}
@@ -146,7 +149,9 @@ public class WorldRenderer {
 		spriteBatch.begin();
 		drawBlocks();
 		drawJet();
-		drawEnemies();
+		drawSpecialEnemies();
+		drawNormalEnemies();
+		
 		drawJetShots();
 		spriteBatch.end();
 		if (debug)
@@ -201,7 +206,7 @@ public class WorldRenderer {
 		}
 	}
 
-	private void drawEnemies() {
+	private void drawNormalEnemies() {
 		List<Enemy> enemiesDead = new ArrayList<Enemy>();
 		for (Enemy enemy : world.getEnemies()) {
 			if (enemy.getState() == Enemy.State.DYING) {
@@ -222,6 +227,29 @@ public class WorldRenderer {
 			}
 		}
 		world.getEnemies().removeAll(enemiesDead);
+	}
+	
+	private void drawSpecialEnemies() {
+		List<Enemy> enemiesDead = new ArrayList<Enemy>();
+		for (Enemy enemy : world.getSpecialEnemies()) {
+			if (enemy.getState() == Enemy.State.DYING) {
+				enemyFrame = deathAnimation.getKeyFrame(enemy.getStateTime(),
+						true);
+
+				spriteBatch.draw(enemyFrame, enemy.getPosition().x * ppuX,
+						enemy.getPosition().y * ppuY, Enemy.SIZE * ppuX,
+						Enemy.SIZE * ppuY);
+				if (deathAnimation.isAnimationFinished(enemy.getStateTime())) {
+					enemiesDead.add(enemy);
+				}
+
+			} else {
+				spriteBatch.draw(specialEnemyTexture, enemy.getPosition().x * ppuX,
+						enemy.getPosition().y * ppuY, Enemy.SIZE * ppuX,
+						Enemy.SIZE * ppuY);
+			}
+		}
+		world.getSpecialEnemies().removeAll(enemiesDead);
 	}
 
 	private void drawJet() {

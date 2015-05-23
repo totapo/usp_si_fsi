@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
@@ -90,10 +89,13 @@ public class WorldController {
 		checkCollisionWithEnemies(delta);
 		checkCollisionWithBullets(delta);
 		killEnemies(delta);
-		artificialIntelligence(delta);
+		moveNormalEnemies(delta);
+		moveSpecialEnemies(delta);
 		world.updateEnemies(delta);
+		world.updateSpecialEnemies(delta);
+		world.createSpecialEnemies();
 		world.updateJetShots(delta);
-		world.createEnemies();
+		world.createNormalEnemies();
 		jet.update(delta);
 	}
 
@@ -142,6 +144,21 @@ public class WorldController {
 					break;
 				}
 			}
+
+			for (Enemy enemy : world.getSpecialEnemies()) {
+
+				if (enemy == null)
+					continue;
+				else {
+					enemy.getBounds().x = enemy.getPosition().x;
+					enemy.getBounds().y = enemy.getPosition().y;
+				}
+				if (jetRect.overlaps(enemy.getBounds())) {
+					jet.setState(Jet.State.DYING);
+					jet.setStateTime(0);
+					break;
+				}
+			}
 		}
 	}
 
@@ -168,7 +185,36 @@ public class WorldController {
 
 	private void killEnemies(float delta) {
 		List<Shot> shotsHit = new ArrayList<Shot>();
-		for (Enemy enemy : world.getEnemies()) {
+		List<Enemy> enemiesTemp = world.getSpecialEnemies();
+		for (Enemy enemy : enemiesTemp) {
+			Rectangle enemyRect = new Rectangle(enemy.getPosition().x,
+					enemy.getPosition().y, enemy.getBounds().width,
+					enemy.getBounds().height);
+
+			// if enemy collides the bullet, make him disappear
+			for (Shot shot : world.getJetShots()) {
+				if (shot == null)
+					continue;
+				else {
+					shot.getBounds().x = shot.getPosition().x;
+					shot.getBounds().y = shot.getPosition().y;
+				}
+				if (enemyRect.overlaps(shot.getBounds())
+						&& enemy.getState() == Enemy.State.MOVING) {
+					enemy.setHp(enemy.getHp() - Jet.DAMAGE);
+					shotsHit.add(shot);
+					if (enemy.getHp() <= 0) {
+						enemy.setState(Enemy.State.DYING);
+						enemy.setStateTime(0);
+						world.setKillCount(world.getKillCount() + 1);
+					}
+
+					break;
+				}
+			}
+		}
+		enemiesTemp = world.getEnemies();
+		for (Enemy enemy : enemiesTemp) {
 			Rectangle enemyRect = new Rectangle(enemy.getPosition().x,
 					enemy.getPosition().y, enemy.getBounds().width,
 					enemy.getBounds().height);
@@ -198,17 +244,37 @@ public class WorldController {
 		world.getJetShots().removeAll(shotsHit);
 	}
 
-	public void artificialIntelligence(float delta) {
+	public void moveNormalEnemies(float delta) {
 		for (Enemy enemy : world.getEnemies()) {
-			
-			// Setting initial vertical acceleration
-			enemy.getVelocity().x = Enemy.SPEED;
-			enemy.getVelocity().y = enemy.getyDirection();
-			// Convert acceleration to frame time
 
-			// apply acceleration to change velocity
+			enemy.getVelocity().x = Enemy.NORMAL_SPEED;
+			enemy.getVelocity().y = enemy.getyDirection();
 			enemy.getPosition().add(enemy.getVelocity());
-			Gdx.app.debug("enemy", enemy.getPosition().x+","+enemy.getPosition().y);
+		}
+	}
+
+	public void moveSpecialEnemies(float delta) {
+		for (Enemy enemy : world.getSpecialEnemies()) {
+
+			enemy.getVelocity().x = Enemy.SPECIAL_SPEED;
+			float jetyPosition = jet.getPosition().y;
+			float jetxPosition = jet.getPosition().x;
+			if (jetxPosition <= enemy.getPosition().x) {
+				enemy.getAcceleration().x = Enemy.SPECIAL_ACCELERATION;
+				enemy.setyDirection(0);;
+			} else {
+				if (jetyPosition > enemy.getPosition().y) {
+					enemy.setyDirection(Enemy.SPECIAL_SPEED);
+				} else if (jetyPosition < enemy.getPosition().y) {
+					enemy.setyDirection(-Enemy.SPECIAL_SPEED);
+				} else {
+					enemy.setyDirection(0);
+				}
+			}
+
+			enemy.getVelocity().y = enemy.getyDirection();
+			enemy.getVelocity().add(enemy.getAcceleration());
+			enemy.getPosition().add(enemy.getVelocity());
 		}
 	}
 

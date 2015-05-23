@@ -1,13 +1,11 @@
 package edu.br.usp.each.si.fsi.ultimate.model;
 
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Timer;
 
 public class World {
 
@@ -15,6 +13,8 @@ public class World {
 	ArrayList<Block> blocks = new ArrayList<Block>();
 	/** The enemies that are in the world **/
 	ArrayList<Enemy> enemies = new ArrayList<Enemy>();
+	/** The special enemies that are in the world **/
+	ArrayList<Enemy> specialEnemies = new ArrayList<Enemy>();
 	/** Our player controlled hero **/
 	Jet jet;
 	/** Contains all the jet's shots/bullets that are on screen */
@@ -54,6 +54,14 @@ public class World {
 
 	public ArrayList<Shot> getEnemiesShots() {
 		return this.enemiesShots;
+	}
+
+	public ArrayList<Enemy> getSpecialEnemies() {
+		return specialEnemies;
+	}
+
+	public void setSpecialEnemies(ArrayList<Enemy> specialEnemies) {
+		this.specialEnemies = specialEnemies;
 	}
 
 	// --------------------
@@ -112,7 +120,7 @@ public class World {
 		// this.blocks = getDrawableBlocks(level.getWidth(), level.getHeight());
 	}
 
-	public void createEnemies() {
+	public void createNormalEnemies() {
 		if (enemies.isEmpty()) {
 			Random rd = new Random();
 			int nrEnemies = rd.nextInt(level.getHeight());
@@ -144,14 +152,55 @@ public class World {
 
 	}
 
+	public void createSpecialEnemies() {
+		if (specialEnemies.size() == 0) {
+
+			/*
+			 * List<Integer> positions = new ArrayList<Integer>(); for (int i =
+			 * 0; i < level.getHeight(); i++) { if (!specialEnemies.contains(i))
+			 * { positions.add(i); } }
+			 */
+			Random rd = new Random();
+
+			int yPosition = rd.nextInt(level.getHeight());
+
+			Enemy enemy = new Enemy(new Vector2(-2, yPosition));
+			enemy.setType(Enemy.EnemyType.SPECIAL);
+			enemy.setHp(Enemy.HP * 2);
+			specialEnemies.add(enemy);
+
+		}
+
+	}
+
 	public void updateEnemies(float delta) {
 		List<Enemy> rmvEnemies = new ArrayList<Enemy>();
+		int yDirectionTemp = 1;
 		for (Enemy enemy : enemies) {
-			if (enemy.position.x > level.getWidth() || enemy.position.y + enemy.getSize() < 0 || enemy.position.y - enemy.getSize() > level.getHeight())
+			if (enemy.position.x > level.getWidth())
+
 				rmvEnemies.add(enemy);
+			else if (enemy.position.y < 0
+					|| enemy.position.y + enemy.getSize() > level.getHeight()) {
+				yDirectionTemp = -1;
+			}
 		}
 		enemies.removeAll(rmvEnemies);
 		for (Enemy enemy : enemies) {
+			enemy.yDirection *= yDirectionTemp;
+			enemy.update(delta);
+		}
+
+	}
+
+	public void updateSpecialEnemies(float delta) {
+		List<Enemy> rmvEnemies = new ArrayList<Enemy>();
+		for (Enemy enemy : specialEnemies) {
+			if (enemy.position.x > level.getWidth())
+				rmvEnemies.add(enemy);
+		}
+		specialEnemies.removeAll(rmvEnemies);
+		for (Enemy enemy : specialEnemies) {
 			enemy.update(delta);
 		}
 
