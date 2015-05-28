@@ -11,9 +11,36 @@ public class Shot {
 	Vector2 position = new Vector2();
 	Rectangle bounds = new Rectangle();
 	Vector2 velocity = new Vector2();
+	private int bulletsPerClick; //quantidade de tiros com um clique.
+	private float angle; //ângulo de variacao entre tiros
+	private float startingAngle; //ângulo do primeiro tiro.
 
-	public Shot(Vector2 position, String imgSrc) {
-		this.speed=-0.1f;
+	public void setStartingAngle(float angle){
+		this.startingAngle = angle;
+	}
+	
+	public float getStartingAngle(){
+		return startingAngle;
+	}
+	
+	public void setAngle(float angle){
+		this.angle = angle;
+	}
+	
+	public void setBulletsPerClick(int bulletsPerClick){
+		this.bulletsPerClick = bulletsPerClick;
+	}
+	
+	public float getAngle(){
+		return this.angle;
+	}
+	
+	public int getBulletsPerClick(){
+		return this.bulletsPerClick;
+	}
+	
+	public Shot(Vector2 position, String imgSrc,float speed) {
+		this.speed=speed;//-0.1f;
 		this.imgSrc = imgSrc;
 		this.position = position;
 		this.bounds.height = SIZE;
@@ -36,9 +63,8 @@ public class Shot {
 		return SIZE;
 	}
 
-	public void update(float delta) {
-		position.x += speed;
-		//position.add(velocity.cpy().scl(delta));
+	public float getSpeed() {
+		return speed;
 	}
 }
 

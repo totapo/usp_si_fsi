@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 import edu.br.usp.each.si.fsi.ultimate.model.Block;
+import edu.br.usp.each.si.fsi.ultimate.model.Bullet;
 import edu.br.usp.each.si.fsi.ultimate.model.Enemy;
 import edu.br.usp.each.si.fsi.ultimate.model.Jet;
 import edu.br.usp.each.si.fsi.ultimate.model.Jet.State;
@@ -184,7 +185,7 @@ public class WorldController {
 	}
 
 	private void killEnemies(float delta) {
-		List<Shot> shotsHit = new ArrayList<Shot>();
+		List<Bullet> shotsHit = new ArrayList<Bullet>();
 		List<Enemy> enemiesTemp = world.getSpecialEnemies();
 		for (Enemy enemy : enemiesTemp) {
 			Rectangle enemyRect = new Rectangle(enemy.getPosition().x,
@@ -192,7 +193,7 @@ public class WorldController {
 					enemy.getBounds().height);
 
 			// if enemy collides the bullet, make him disappear
-			for (Shot shot : world.getJetShots()) {
+			for (Bullet shot : world.getJetShots()) {
 				if (shot == null)
 					continue;
 				else {
@@ -220,7 +221,7 @@ public class WorldController {
 					enemy.getBounds().height);
 
 			// if enemy collides the bullet, make him disappear
-			for (Shot shot : world.getJetShots()) {
+			for (Bullet shot : world.getJetShots()) {
 				if (shot == null)
 					continue;
 				else {

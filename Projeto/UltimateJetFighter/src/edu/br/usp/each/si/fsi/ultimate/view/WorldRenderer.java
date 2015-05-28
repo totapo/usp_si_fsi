@@ -22,6 +22,7 @@ import com.badlogic.gdx.utils.SharedLibraryLoader;
 import edu.br.usp.each.si.fsi.ultimate.Numbers;
 import edu.br.usp.each.si.fsi.ultimate.controller.WorldController;
 import edu.br.usp.each.si.fsi.ultimate.model.Block;
+import edu.br.usp.each.si.fsi.ultimate.model.Bullet;
 import edu.br.usp.each.si.fsi.ultimate.model.Enemy;
 import edu.br.usp.each.si.fsi.ultimate.model.Enemy.State;
 import edu.br.usp.each.si.fsi.ultimate.model.Jet;
@@ -268,10 +269,32 @@ public class WorldRenderer {
 	}
 
 	private void drawJetShots() {
-		for (Shot shot : world.getJetShots()) {
-			spriteBatch.draw(shotTexture, shot.getPosition().x * ppuX,
-					shot.getPosition().y * ppuY, Shot.SIZE * ppuX, Shot.SIZE
-							* ppuY);
+		for (Bullet bullet : world.getJetShots()) {
+			spriteBatch.draw(
+					shotTexture, 
+					(bullet.getPosition().x)* ppuX,
+					(bullet.getPosition().y) * ppuY,
+					bullet.getSize()/2, 
+					bullet.getSize()/2,
+					bullet.getSize() * ppuX,
+					bullet.getSize()* ppuY,
+					1,1,
+					bullet.getAngle()-90,
+					0,0,
+					shotTexture.getWidth(),
+					shotTexture.getHeight(),
+					false,false);
+			/*
+			texture,
+			x,
+			y,
+			orign x e y,
+			width height, 
+			scalex e y, 
+			rotation, 
+			srcX, srcY, 
+			srcwidthheight, bool flipxy
+			 */
 		}
 	}
 

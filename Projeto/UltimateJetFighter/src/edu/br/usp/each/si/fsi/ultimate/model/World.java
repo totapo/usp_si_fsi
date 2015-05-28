@@ -18,7 +18,7 @@ public class World {
 	/** Our player controlled hero **/
 	Jet jet;
 	/** Contains all the jet's shots/bullets that are on screen */
-	ArrayList<Shot> jetShots = new ArrayList<Shot>();
+	ArrayList<Bullet> jetShots = new ArrayList<Bullet>();
 	/** Contains all the enemy's shots/bullets that are on screen */
 	ArrayList<Shot> enemiesShots = new ArrayList<Shot>();
 	/** A world has a level through which Bob needs to go through **/
@@ -48,7 +48,7 @@ public class World {
 		this.killCount = n;
 	}
 
-	public ArrayList<Shot> getJetShots() {
+	public ArrayList<Bullet> getJetShots() {
 		return this.jetShots;
 	}
 
@@ -106,16 +106,22 @@ public class World {
 
 	public void shoot(Object source) {
 		if (source instanceof Jet) {
-			Shot bullet = new Shot(((Jet) source).getPosition().cpy(), "");
-			bullet.getPosition().y += jet.getSize() / 2 - bullet.getSize() / 2;// ((Jet)
-																				// source).getShot();
-			this.jetShots.add(bullet);
+			Shot shot =((Jet) source).getShot();
+			Bullet bullet;
+			for(int i=0; i<shot.getBulletsPerClick();i++){
+				bullet = new Bullet(shot.getStartingAngle()+shot.getAngle()*i,shot.getSpeed(),jet.getPosition().cpy(),shot.getSize());
+				bullet.getPosition().y += jet.getSize() / 2 - bullet.getSize() / 2;
+				this.jetShots.add(bullet);
+			}
 		}
 	}
 
 	private void createDemoWorld() {
 		jet = new Jet(new Vector2(3, 5), new Shot(new Vector2(0, 0),
-				"images/shot.png"));
+				"images/shot.png",-8f));
+		jet.getShot().setBulletsPerClick(3);
+		jet.getShot().setAngle(15f);//30f);
+		jet.getShot().setStartingAngle(75f);
 		level = new Level();
 		// this.blocks = getDrawableBlocks(level.getWidth(), level.getHeight());
 	}
@@ -207,13 +213,13 @@ public class World {
 	}
 
 	public void updateJetShots(float delta) {
-		List<Shot> rmvShots = new ArrayList<Shot>();
-		for (Shot shot : jetShots) {
+		List<Bullet> rmvShots = new ArrayList<Bullet>();
+		for (Bullet shot : jetShots) {
 			if (shot.position.x > level.getWidth() || (shot.position.x < 0))
 				rmvShots.add(shot);
 		}
 		jetShots.removeAll(rmvShots);
-		for (Shot shot : jetShots) {
+		for (Bullet shot : jetShots) {
 			shot.update(delta);
 		}
 	}

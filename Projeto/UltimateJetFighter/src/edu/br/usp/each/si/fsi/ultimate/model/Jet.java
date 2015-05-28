@@ -37,7 +37,7 @@ public class Jet {
 	}
 
 	public Shot getShot() {
-		return new Shot(shot.position, shot.getImgSrc());
+		return shot;
 	}
 
 	public float getSize() {
