@@ -14,6 +14,7 @@ public class Shot {
 	private int bulletsPerClick; //quantidade de tiros com um clique.
 	private float angle; //ângulo de variacao entre tiros
 	private float startingAngle; //ângulo do primeiro tiro.
+	private boolean multiAction;
 
 	public void setStartingAngle(float angle){
 		this.startingAngle = angle;
@@ -39,12 +40,17 @@ public class Shot {
 		return this.bulletsPerClick;
 	}
 	
-	public Shot(Vector2 position, String imgSrc,float speed) {
+	public boolean isMultiAction(){
+		return this.multiAction;
+	}
+	
+	public Shot(Vector2 position, String imgSrc,float speed,boolean multiAction) {
 		this.speed=speed;//-0.1f;
 		this.imgSrc = imgSrc;
 		this.position = position;
 		this.bounds.height = SIZE;
 		this.bounds.width = SIZE;
+		this.multiAction = multiAction;
 	}
 	
 	public String getImgSrc(){

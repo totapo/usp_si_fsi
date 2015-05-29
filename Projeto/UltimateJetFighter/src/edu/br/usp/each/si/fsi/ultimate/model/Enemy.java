@@ -1,6 +1,7 @@
 package edu.br.usp.each.si.fsi.ultimate.model;
 
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
@@ -16,6 +17,9 @@ public class Enemy {
 	public static final int HP = 10;
 	float stateTime = 0;
 	
+	private double timerShot; //controle de tiros por segundo
+	private double previousShot;
+	
 
 	double hp;
 	
@@ -29,16 +33,26 @@ public class Enemy {
 	State state = State.MOVING;
 	EnemyType type = EnemyType.NORMAL;
 
-	
+	private Shot shot;
 
 
-	public Enemy(Vector2 position) {
+	public Enemy(Vector2 position, Shot shot, double timerShot) {
 		this.position = position;
 		this.bounds.height = SIZE;
 		this.bounds.width = SIZE;
 		hp = HP;
+		this.shot = shot;
+		this.setTimerShot(timerShot);
+		this.setPreviousShot(Gdx.graphics.getRawDeltaTime());
 	}
 	
+	public Shot getShot(){
+		return shot;
+	}
+	
+	public void setShot(Shot shot){
+		this.shot = shot;
+	}
 
 	public double getHp() {
 		return hp;
@@ -107,5 +121,21 @@ public class Enemy {
 		stateTime += delta;
 		position.add(velocity.cpy().scl(delta));
 		
+	}
+
+	public double getTimerShot() {
+		return timerShot;
+	}
+
+	public void setTimerShot(double timerShot) {
+		this.timerShot = timerShot;
+	}
+
+	public double getPreviousShot() {
+		return previousShot;
+	}
+
+	public void setPreviousShot(double previousShot) {
+		this.previousShot = previousShot;
 	}
 }

@@ -24,8 +24,8 @@ public class Jet {
 	public Jet(Vector2 position, Shot shot) {
 		this.shot = shot;
 		this.position = position;
-		this.bounds.height = SIZE;
-		this.bounds.width = SIZE;
+		this.bounds.height = SIZE/4;
+		this.bounds.width = SIZE/4;
 	}
 
 	public Rectangle getBounds() {

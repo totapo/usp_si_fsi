@@ -5,12 +5,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 import edu.br.usp.each.si.fsi.ultimate.model.Block;
 import edu.br.usp.each.si.fsi.ultimate.model.Bullet;
 import edu.br.usp.each.si.fsi.ultimate.model.Enemy;
+import edu.br.usp.each.si.fsi.ultimate.model.Enemy.EnemyType;
 import edu.br.usp.each.si.fsi.ultimate.model.Jet;
 import edu.br.usp.each.si.fsi.ultimate.model.Jet.State;
 import edu.br.usp.each.si.fsi.ultimate.model.Shot;
@@ -24,6 +26,7 @@ public class WorldController {
 
 	private World world;
 	private Jet jet;
+	private double time;
 
 	static Map<Keys, Boolean> keys = new HashMap<WorldController.Keys, Boolean>();
 	static {
@@ -35,6 +38,7 @@ public class WorldController {
 	public WorldController(World world) {
 		this.world = world;
 		this.jet = world.getJet();
+		time=0;
 	}
 
 	// ** Key presses and touches **************** //
@@ -86,18 +90,36 @@ public class WorldController {
 	/** The main update method **/
 	public void update(float delta) {
 		processInput();
+		time+=Gdx.graphics.getRawDeltaTime();
 		checkCollisionWithBlocks(delta);
 		checkCollisionWithEnemies(delta);
 		checkCollisionWithBullets(delta);
 		killEnemies(delta);
 		moveNormalEnemies(delta);
 		moveSpecialEnemies(delta);
+		makeEnemiesShoot(delta);
 		world.updateEnemies(delta);
 		world.updateSpecialEnemies(delta);
 		world.createSpecialEnemies();
 		world.updateJetShots(delta);
+		world.updateEnemyShots(delta);
 		world.createNormalEnemies();
 		jet.update(delta);
+	}
+
+	private void makeEnemiesShoot(float delta) {
+		for(Enemy enemy: world.getEnemies()){
+			if(time-enemy.getPreviousShot()>=enemy.getTimerShot()){
+				world.shoot(enemy);
+				enemy.setPreviousShot(time);
+			}
+		}
+		for(Enemy enemy: world.getSpecialEnemies()){
+			if(time-enemy.getPreviousShot()>=enemy.getTimerShot()){
+				world.shoot(enemy);
+				enemy.setPreviousShot(time);
+			}
+		}
 	}
 
 	/** Collision checking **/
@@ -126,8 +148,8 @@ public class WorldController {
 
 	private void checkCollisionWithEnemies(float delta) {
 		if (jet.getState() != Jet.State.DYING) {
-			Rectangle jetRect = new Rectangle(jet.getPosition().x,
-					jet.getPosition().y, jet.getBounds().width,
+			Rectangle jetRect = new Rectangle(jet.getPosition().x+jet.getSize()/2-jet.getSize()/8,
+					jet.getPosition().y+jet.getSize()/2-jet.getSize()/8, jet.getBounds().width,
 					jet.getBounds().height);
 
 			// if jet collides, make his position (3, 5)
@@ -142,6 +164,7 @@ public class WorldController {
 				if (jetRect.overlaps(enemy.getBounds())) {
 					jet.setState(Jet.State.DYING);
 					jet.setStateTime(0);
+					world.downgradeDmgJet();
 					break;
 				}
 			}
@@ -157,6 +180,7 @@ public class WorldController {
 				if (jetRect.overlaps(enemy.getBounds())) {
 					jet.setState(Jet.State.DYING);
 					jet.setStateTime(0);
+					world.downgradeDmgJet();
 					break;
 				}
 			}
@@ -164,12 +188,12 @@ public class WorldController {
 	}
 
 	private void checkCollisionWithBullets(float delta) {
-		Rectangle jetRect = new Rectangle(jet.getPosition().x,
-				jet.getPosition().y, jet.getBounds().width,
+		Rectangle jetRect = new Rectangle(jet.getPosition().x+jet.getSize()/2-jet.getSize()/8,
+				jet.getPosition().y+jet.getSize()/2-jet.getSize()/8, jet.getBounds().width,
 				jet.getBounds().height);
 
 		// if jet collides, make his position (3, 5)
-		for (Shot shot : world.getEnemiesShots()) {
+		for (Bullet shot : world.getEnemiesShots()) {
 			if (shot == null)
 				continue;
 			else {
@@ -178,6 +202,7 @@ public class WorldController {
 			}
 			if (jetRect.overlaps(shot.getBounds())) {
 				jet.setState(Jet.State.DYING);
+				world.downgradeDmgJet();
 				// jet.getPosition().set(new Vector2(3, 5));
 				break;
 			}
@@ -236,6 +261,8 @@ public class WorldController {
 						enemy.setState(Enemy.State.DYING);
 						enemy.setStateTime(0);
 						world.setKillCount(world.getKillCount() + 1);
+						world.upDmgJet();
+						
 					}
 
 					break;

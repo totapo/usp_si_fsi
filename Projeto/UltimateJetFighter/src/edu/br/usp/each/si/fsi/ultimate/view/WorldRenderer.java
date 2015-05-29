@@ -68,6 +68,8 @@ public class WorldRenderer {
 	private TextureRegion enemyFrame;
 	
 	float time;
+	private Texture enemyShotTexture;
+	private Texture squareTexture;
 
 	public void setSize(int w, int h) {
 		this.width = w;
@@ -116,7 +118,8 @@ public class WorldRenderer {
 		specialEnemyTexture = new Texture(
 				Gdx.files.internal("images/specialEnemy.png"));
 		shotTexture = new Texture(Gdx.files.internal("images/shot.png"));
-
+		enemyShotTexture = new Texture(Gdx.files.internal("images/enemyShotTest.png"));
+		squareTexture = new Texture(Gdx.files.internal("images/quadrado.png"));
 	}
 
 	// load the jet animation
@@ -152,8 +155,8 @@ public class WorldRenderer {
 		drawJet();
 		drawSpecialEnemies();
 		drawNormalEnemies();
-		
 		drawJetShots();
+		drawEnemyShots();
 		spriteBatch.end();
 		if (debug)
 			drawDebug();
@@ -162,6 +165,25 @@ public class WorldRenderer {
 		this.hudBatch.end();
 	}
 	
+	private void drawEnemyShots() {
+		for (Bullet bullet : world.getEnemiesShots()) {
+			spriteBatch.draw(
+					enemyShotTexture, 
+					bullet.getPosition().x* ppuX,
+					bullet.getPosition().y * ppuY,
+					bullet.getSize()/2, 
+					bullet.getSize()/2,
+					bullet.getSize() * ppuX,
+					bullet.getSize()* ppuY,
+					1,1,
+					bullet.getAngle()-90,
+					0,0,
+					enemyShotTexture.getWidth(),
+					enemyShotTexture.getHeight(),
+					false,false);
+		}
+	}
+
 	private void drawHud(){
 		hudBatch.draw(enemyTexture, 0.1f * ppuX,
 					0.1f * ppuY, Enemy.SIZE * ppuX, Enemy.SIZE
@@ -182,6 +204,10 @@ public class WorldRenderer {
 							* ppuY);
 			aux+=Enemy.SIZE/2;
 		}
+		Jet jet = world.getJet();
+		hudBatch.draw(squareTexture, (jet.getPosition().x+jet.getSize()/2-jet.getSize()/8) * ppuX,
+				(jet.getPosition().y+jet.getSize()/2-jet.getSize()/8)*ppuY,
+				jet.getSize()/4*ppuX,jet.getSize()/4*ppuY);
 		/*time += Gdx.graphics.getRawDeltaTime();
 		int minutes = ((int)time) / 60;
 	    int seconds = ((int)time) % 60;
@@ -261,9 +287,10 @@ public class WorldRenderer {
 			jetFrame = deathAnimation.getKeyFrame(jet.getStateTime(), true);
 			if(deathAnimation.isAnimationFinished(jet.getStateTime())){
 				jet.setState(Jet.State.IDLE);
-				jet.getPosition().set(new Vector2(9, 3));
+				jet.getPosition().set(new Vector2(7, 3));
 			}
 		}
+		
 		spriteBatch.draw(jetFrame, jet.getPosition().x * ppuX,
 				jet.getPosition().y * ppuY, Jet.SIZE * ppuX, Jet.SIZE * ppuY);
 	}

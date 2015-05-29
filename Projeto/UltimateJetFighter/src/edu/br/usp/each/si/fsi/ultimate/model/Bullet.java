@@ -5,7 +5,6 @@ import com.badlogic.gdx.math.Vector2;
 
 public class Bullet {
 	private float angle;
-	private float speed;
 	private float size;
 	Vector2 position = new Vector2();
 	Vector2 velocity = new Vector2();
@@ -14,7 +13,6 @@ public class Bullet {
 	
 	public Bullet(float ang, float speed,Vector2 position, float size){
 		angle = ang;
-		this.speed = speed;
 		this.velocity=new Vector2(speed,0);
 		velocity.rotate(angle-90);
 		this.position = position;
@@ -39,7 +37,6 @@ public class Bullet {
 	}
 	
 	public void update(float delta) {
-		//position.x += speed;
 		position.add(velocity.cpy().scl(delta));
 	}
 }
