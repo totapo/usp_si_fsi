@@ -12,10 +12,24 @@ public class Jet {
 	// private float speed;
 	// private float size;
 	private Shot shot; // TODO pode passar pra shots
-	public static final float SPEED = 4f; // unit per second
-	public static final float SIZE = 0.5f; // half a unit
-	public static final int DAMAGE = 5;
-	float stateTime = 0;
+	private float speed = 4f; // unit per second
+	private float size = 0.5f; // half a unit
+	private int damage = 5;
+	private float stateTime = 0;
+	private String skin_path;
+	private int hp;
+	private int lvl;
+	private long xp;
+	private int defense;
+	private int id;
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
 
 	Vector2 position = new Vector2();
 	Rectangle bounds = new Rectangle();
@@ -24,8 +38,76 @@ public class Jet {
 	public Jet(Vector2 position, Shot shot) {
 		this.shot = shot;
 		this.position = position;
-		this.bounds.height = SIZE/4;
-		this.bounds.width = SIZE/4;
+		this.bounds.height = size/4;
+		this.bounds.width = size/4;
+	}
+	
+	public Jet(){
+		
+	}
+
+	public int getDefense() {
+		return defense;
+	}
+
+	public void setDefense(int defense) {
+		this.defense = defense;
+	}
+
+	public float getSpeed() {
+		return speed;
+	}
+
+	public void setSpeed(float speed) {
+		this.speed = speed;
+	}
+
+	public int getDamage() {
+		return damage;
+	}
+
+	public void setDamage(int damage) {
+		this.damage = damage;
+	}
+
+	public String getSkin_path() {
+		return skin_path;
+	}
+
+	public void setSkin_path(String skin_path) {
+		this.skin_path = skin_path;
+	}
+
+	public int getHp() {
+		return hp;
+	}
+
+	public void setHp(int hp) {
+		this.hp = hp;
+	}
+
+	public int getLvl() {
+		return lvl;
+	}
+
+	public void setLvl(int lvl) {
+		this.lvl = lvl;
+	}
+
+	public long getXp() {
+		return xp;
+	}
+
+	public void setXp(long xp) {
+		this.xp = xp;
+	}
+
+	public void setShot(Shot shot) {
+		this.shot = shot;
+	}
+
+	public void setSize(float size) {
+		this.size = size;
 	}
 
 	public Rectangle getBounds() {
@@ -41,7 +123,7 @@ public class Jet {
 	}
 
 	public float getSize() {
-		return SIZE;
+		return size;
 	}
 
 	private boolean facingLeft;

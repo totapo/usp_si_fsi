@@ -20,6 +20,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.SharedLibraryLoader;
 
 import edu.br.usp.each.si.fsi.ultimate.Numbers;
+import edu.br.usp.each.si.fsi.ultimate.controller.LevelLoader;
 import edu.br.usp.each.si.fsi.ultimate.controller.WorldController;
 import edu.br.usp.each.si.fsi.ultimate.model.Block;
 import edu.br.usp.each.si.fsi.ultimate.model.Bullet;
@@ -37,6 +38,7 @@ public class WorldRenderer {
 
 	private World world;
 	private OrthographicCamera cam;
+	private LevelLoader lvlLoader;
 
 	/** for debug rendering **/
 	ShapeRenderer debugRenderer = new ShapeRenderer();
@@ -96,6 +98,7 @@ public class WorldRenderer {
 
 	public WorldRenderer(World world, boolean debug) {
 		this.world = world;
+		world.setLevel(LevelLoader.loadLevel(world.getJet()));
 		time=0;
 		this.cam = new OrthographicCamera(CAMERA_WIDTH, CAMERA_HEIGHT);
 		this.cam.position.set(CAMERA_WIDTH / 2f, CAMERA_HEIGHT / 2f, 0);
@@ -292,7 +295,7 @@ public class WorldRenderer {
 		}
 		
 		spriteBatch.draw(jetFrame, jet.getPosition().x * ppuX,
-				jet.getPosition().y * ppuY, Jet.SIZE * ppuX, Jet.SIZE * ppuY);
+				jet.getPosition().y * ppuY, jet.getSize() * ppuX, jet.getSize() * ppuY);
 	}
 
 	private void drawJetShots() {

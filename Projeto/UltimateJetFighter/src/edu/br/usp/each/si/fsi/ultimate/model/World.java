@@ -21,7 +21,7 @@ public class World {
 	ArrayList<Bullet> jetShots = new ArrayList<Bullet>();
 	/** Contains all the enemy's shots/bullets that are on screen */
 	ArrayList<Bullet> enemiesShots = new ArrayList<Bullet>();
-	/** A world has a level through which Bob needs to go through **/
+	/** A world has a level through which jet needs to go through **/
 	Level level;
 	/** Player Kill count */
 	int killCount;
@@ -96,6 +96,14 @@ public class World {
 			}
 		}
 		return blocks;
+	}
+
+	public Level getLevel() {
+		return level;
+	}
+
+	public void setLevel(Level level) {
+		this.level = level;
 	}
 
 	// --------------------

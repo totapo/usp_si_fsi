@@ -12,10 +12,8 @@ import com.badlogic.gdx.math.Vector2;
 import edu.br.usp.each.si.fsi.ultimate.model.Block;
 import edu.br.usp.each.si.fsi.ultimate.model.Bullet;
 import edu.br.usp.each.si.fsi.ultimate.model.Enemy;
-import edu.br.usp.each.si.fsi.ultimate.model.Enemy.EnemyType;
 import edu.br.usp.each.si.fsi.ultimate.model.Jet;
 import edu.br.usp.each.si.fsi.ultimate.model.Jet.State;
-import edu.br.usp.each.si.fsi.ultimate.model.Shot;
 import edu.br.usp.each.si.fsi.ultimate.model.World;
 
 public class WorldController {
@@ -38,7 +36,7 @@ public class WorldController {
 	public WorldController(World world) {
 		this.world = world;
 		this.jet = world.getJet();
-		time=0;
+		time = 0;
 	}
 
 	// ** Key presses and touches **************** //
@@ -90,7 +88,7 @@ public class WorldController {
 	/** The main update method **/
 	public void update(float delta) {
 		processInput();
-		time+=Gdx.graphics.getRawDeltaTime();
+		time += Gdx.graphics.getRawDeltaTime();
 		checkCollisionWithBlocks(delta);
 		checkCollisionWithEnemies(delta);
 		checkCollisionWithBullets(delta);
@@ -108,14 +106,14 @@ public class WorldController {
 	}
 
 	private void makeEnemiesShoot(float delta) {
-		for(Enemy enemy: world.getEnemies()){
-			if(time-enemy.getPreviousShot()>=enemy.getTimerShot()){
+		for (Enemy enemy : world.getEnemies()) {
+			if (time - enemy.getPreviousShot() >= enemy.getTimerShot()) {
 				world.shoot(enemy);
 				enemy.setPreviousShot(time);
 			}
 		}
-		for(Enemy enemy: world.getSpecialEnemies()){
-			if(time-enemy.getPreviousShot()>=enemy.getTimerShot()){
+		for (Enemy enemy : world.getSpecialEnemies()) {
+			if (time - enemy.getPreviousShot() >= enemy.getTimerShot()) {
 				world.shoot(enemy);
 				enemy.setPreviousShot(time);
 			}
@@ -148,9 +146,10 @@ public class WorldController {
 
 	private void checkCollisionWithEnemies(float delta) {
 		if (jet.getState() != Jet.State.DYING) {
-			Rectangle jetRect = new Rectangle(jet.getPosition().x+jet.getSize()/2-jet.getSize()/8,
-					jet.getPosition().y+jet.getSize()/2-jet.getSize()/8, jet.getBounds().width,
-					jet.getBounds().height);
+			Rectangle jetRect = new Rectangle(
+					jet.getPosition().x + jet.getSize() / 2 - jet.getSize() / 8,
+					jet.getPosition().y + jet.getSize() / 2 - jet.getSize() / 8,
+					jet.getBounds().width, jet.getBounds().height);
 
 			// if jet collides, make his position (3, 5)
 			for (Enemy enemy : world.getEnemies()) {
@@ -188,23 +187,27 @@ public class WorldController {
 	}
 
 	private void checkCollisionWithBullets(float delta) {
-		Rectangle jetRect = new Rectangle(jet.getPosition().x+jet.getSize()/2-jet.getSize()/8,
-				jet.getPosition().y+jet.getSize()/2-jet.getSize()/8, jet.getBounds().width,
-				jet.getBounds().height);
+		if (jet.getState() != Jet.State.DYING) {
+			Rectangle jetRect = new Rectangle(
+					jet.getPosition().x + jet.getSize() / 2 - jet.getSize() / 8,
+					jet.getPosition().y + jet.getSize() / 2 - jet.getSize() / 8,
+					jet.getBounds().width, jet.getBounds().height);
 
-		// if jet collides, make his position (3, 5)
-		for (Bullet shot : world.getEnemiesShots()) {
-			if (shot == null)
-				continue;
-			else {
-				shot.getBounds().x = shot.getPosition().x;
-				shot.getBounds().y = shot.getPosition().y;
-			}
-			if (jetRect.overlaps(shot.getBounds())) {
-				jet.setState(Jet.State.DYING);
-				world.downgradeDmgJet();
-				// jet.getPosition().set(new Vector2(3, 5));
-				break;
+			// if jet collides, make his position (3, 5)
+			for (Bullet shot : world.getEnemiesShots()) {
+				if (shot == null)
+					continue;
+				else {
+					shot.getBounds().x = shot.getPosition().x;
+					shot.getBounds().y = shot.getPosition().y;
+				}
+				if (jetRect.overlaps(shot.getBounds())) {
+					jet.setState(Jet.State.DYING);
+					jet.setStateTime(0);
+					world.downgradeDmgJet();
+					// jet.getPosition().set(new Vector2(3, 5));
+					break;
+				}
 			}
 		}
 	}
@@ -227,7 +230,7 @@ public class WorldController {
 				}
 				if (enemyRect.overlaps(shot.getBounds())
 						&& enemy.getState() == Enemy.State.MOVING) {
-					enemy.setHp(enemy.getHp() - Jet.DAMAGE);
+					enemy.setHp(enemy.getHp() - jet.getDamage());
 					shotsHit.add(shot);
 					if (enemy.getHp() <= 0) {
 						enemy.setState(Enemy.State.DYING);
@@ -255,14 +258,14 @@ public class WorldController {
 				}
 				if (enemyRect.overlaps(shot.getBounds())
 						&& enemy.getState() == Enemy.State.MOVING) {
-					enemy.setHp(enemy.getHp() - Jet.DAMAGE);
+					enemy.setHp(enemy.getHp() - jet.getDamage());
 					shotsHit.add(shot);
 					if (enemy.getHp() <= 0) {
 						enemy.setState(Enemy.State.DYING);
 						enemy.setStateTime(0);
 						world.setKillCount(world.getKillCount() + 1);
 						world.upDmgJet();
-						
+
 					}
 
 					break;
@@ -289,7 +292,8 @@ public class WorldController {
 			float jetxPosition = jet.getPosition().x;
 			if (jetxPosition <= enemy.getPosition().x) {
 				enemy.getAcceleration().x = Enemy.SPECIAL_ACCELERATION;
-				enemy.setyDirection(0);;
+				enemy.setyDirection(0);
+				;
 			} else {
 				if (jetyPosition > enemy.getPosition().y) {
 					enemy.setyDirection(Enemy.SPECIAL_SPEED);
