@@ -8,7 +8,9 @@ import com.badlogic.gdx.math.Vector2;
 public class Enemy {
 	
 	public enum State{MOVING,DYING};
-	public enum EnemyType{NORMAL, SPECIAL};
+	public enum MoveType{NORMAL, SPECIAL};
+	
+	private EnemyType type;
 
 	public static final float NORMAL_SPEED = 0.02f; // unit per second
 	public static final float SPECIAL_SPEED = 0.01f; // unit per second
@@ -17,8 +19,18 @@ public class Enemy {
 	public static final int HP = 10;
 	float stateTime = 0;
 	
+	private int id;
+	
+
+	private int id_shot;
+	private int damage;
+	private float velocityTemp;
+	private int id_enemy_type;
+	
+	
 	private double timerShot; //controle de tiros por segundo
 	private double previousShot;
+	private int maxNumber;
 	
 
 	double hp;
@@ -31,7 +43,6 @@ public class Enemy {
 	
 
 	State state = State.MOVING;
-	EnemyType type = EnemyType.NORMAL;
 
 	private Shot shot;
 
@@ -44,6 +55,58 @@ public class Enemy {
 		this.shot = shot;
 		this.setTimerShot(timerShot);
 		this.setPreviousShot(Gdx.graphics.getRawDeltaTime());
+	}
+	
+	public Enemy(){
+		
+	}
+	
+	public int getMaxNumber() {
+		return maxNumber;
+	}
+
+	public void setMaxNumber(int maxNumber) {
+		this.maxNumber = maxNumber;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public int getId_shot() {
+		return id_shot;
+	}
+
+	public void setId_shot(int id_shot) {
+		this.id_shot = id_shot;
+	}
+
+	public int getDamage() {
+		return damage;
+	}
+
+	public void setDamage(int damage) {
+		this.damage = damage;
+	}
+
+	public float getVelocityTemp() {
+		return velocityTemp;
+	}
+
+	public void setVelocityTemp(float velocityTemp) {
+		this.velocityTemp = velocityTemp;
+	}
+
+	public int getId_enemy_type() {
+		return id_enemy_type;
+	}
+
+	public void setId_enemy_type(int id_enemy_type) {
+		this.id_enemy_type = id_enemy_type;
 	}
 	
 	public Shot getShot(){

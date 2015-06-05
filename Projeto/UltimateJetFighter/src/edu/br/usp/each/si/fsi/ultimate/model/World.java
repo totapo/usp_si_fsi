@@ -208,7 +208,7 @@ public class World {
 			enemy.getShot().setAngle(10);
 			enemy.getShot().setStartingAngle(0);
 			enemy.getShot().setBulletsPerClick(36);
-			enemy.setType(Enemy.EnemyType.SPECIAL);
+			//enemy.setType(Enemy.EnemyType.SPECIAL);
 			enemy.setHp(Enemy.HP * 2);
 			specialEnemies.add(enemy);
 

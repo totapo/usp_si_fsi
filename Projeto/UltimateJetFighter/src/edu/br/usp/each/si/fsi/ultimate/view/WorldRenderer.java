@@ -2,10 +2,8 @@ package edu.br.usp.each.si.fsi.ultimate.view;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -17,15 +15,12 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.SharedLibraryLoader;
 
 import edu.br.usp.each.si.fsi.ultimate.Numbers;
 import edu.br.usp.each.si.fsi.ultimate.controller.LevelLoader;
-import edu.br.usp.each.si.fsi.ultimate.controller.WorldController;
 import edu.br.usp.each.si.fsi.ultimate.model.Block;
 import edu.br.usp.each.si.fsi.ultimate.model.Bullet;
 import edu.br.usp.each.si.fsi.ultimate.model.Enemy;
-import edu.br.usp.each.si.fsi.ultimate.model.Enemy.State;
 import edu.br.usp.each.si.fsi.ultimate.model.Jet;
 import edu.br.usp.each.si.fsi.ultimate.model.Shot;
 import edu.br.usp.each.si.fsi.ultimate.model.World;
@@ -98,7 +93,8 @@ public class WorldRenderer {
 
 	public WorldRenderer(World world, boolean debug) {
 		this.world = world;
-		world.setLevel(LevelLoader.loadLevel(world.getJet()));
+		lvlLoader = new LevelLoader();
+		world.setLevel(lvlLoader.loadLevel(world.getJet(), 1));
 		time=0;
 		this.cam = new OrthographicCamera(CAMERA_WIDTH, CAMERA_HEIGHT);
 		this.cam.position.set(CAMERA_WIDTH / 2f, CAMERA_HEIGHT / 2f, 0);

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<enemies>
+<type id="1">
+  <height>0.5</height>
+  <width>0.5</width>
+  <hp>10</hp>
+  <skin_path>normal_enemy</skin_path>
+  <id_shot>1</id_shot>
+</type>
+</enemies>

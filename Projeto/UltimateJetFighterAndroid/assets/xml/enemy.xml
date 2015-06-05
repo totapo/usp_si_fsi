@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<enemies>
+<enemy id="1">
+  <id_enemy_type>1</id_enemy_type>
+  <damage>10</damage>
+  <velocity>0.02</velocity>
+  <id_shot>1</id_shot>
+</enemy>
+</enemies>

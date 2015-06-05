@@ -15,7 +15,6 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
 
 import edu.br.usp.each.si.fsi.ultimate.model.Jet;
 
@@ -27,13 +26,13 @@ public class JetDAO {
 	public static List<Jet> getJets() throws IOException, JDOMException {
 		List<Jet> jets = new ArrayList<Jet>();
 		SAXBuilder builder = new SAXBuilder();
-		File xmlFile = new File("xml/jet.xml");
+		File xmlFile = new File(STORAGE_PATH);
 
 		try {
 
 			Document document = (Document) builder.build(xmlFile);
 			Element rootNode = document.getRootElement();
-			List<Element> list = rootNode.getChildren("item");
+			List<Element> list = rootNode.getChildren("jet");
 
 			for (int i = 0; i < list.size(); i++) {
 

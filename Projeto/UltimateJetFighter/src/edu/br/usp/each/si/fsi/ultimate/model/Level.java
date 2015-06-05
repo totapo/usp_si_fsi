@@ -1,12 +1,30 @@
 package edu.br.usp.each.si.fsi.ultimate.model;
 
-import com.badlogic.gdx.math.Vector2;
+import java.util.ArrayList;
 
 
 public class Level {
 	private int width;
 	private int height;
 	private Block[][] blocks;
+	private ArrayList<Enemy> enemies;
+	private Stage stage;
+	
+	public Stage getStage() {
+		return stage;
+	}
+
+	public void setStage(Stage stage) {
+		this.stage = stage;
+	}
+
+	public ArrayList<Enemy> getEnemies() {
+		return enemies;
+	}
+
+	public void setEnemies(ArrayList<Enemy> enemies) {
+		this.enemies = enemies;
+	}
 
 	public int getWidth() {
 		return width;

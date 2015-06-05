@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stage>
+<enemy_info id="1">
+  <max_number>8</max_number>
+  <id_shot>1</id_shot>
+  <id_enemy>1</id_enemy>
+</enemy_info>
+<enemy_info id="2">
+  <max_number>1</max_number>
+  <id_shot>2</id_shot>
+  <id_enemy>2</id_enemy>
+</enemy_info>
+</stage>
