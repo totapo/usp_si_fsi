@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Rectangle;
@@ -25,6 +26,7 @@ public class WorldController {
 	private World world;
 	private Jet jet;
 	private double time;
+	private boolean createBoss = true;
 
 	static Map<Keys, Boolean> keys = new HashMap<WorldController.Keys, Boolean>();
 	static {
@@ -95,13 +97,20 @@ public class WorldController {
 		killEnemies(delta);
 		moveNormalEnemies(delta);
 		moveSpecialEnemies(delta);
+		moveBoss(delta);
 		makeEnemiesShoot(delta);
 		world.updateEnemies(delta);
 		world.updateSpecialEnemies(delta);
-		world.createSpecialEnemies();
 		world.updateJetShots(delta);
 		world.updateEnemyShots(delta);
-		world.createNormalEnemies();
+		// world.createNormalEnemies();
+		// world.createSpecialEnemies();
+		if (createBoss) {
+			world.createBoss(delta);
+			createBoss = false;
+		}
+		if (world.getBoss() != null)
+			world.getBoss().update(delta);
 		jet.update(delta);
 	}
 
@@ -183,6 +192,18 @@ public class WorldController {
 					break;
 				}
 			}
+
+			if (world.getBoss() != null) {
+				Rectangle bossRect = new Rectangle(world.getBoss()
+						.getPosition().x, world.getBoss().getPosition().y,
+						Enemy.BOSS_SIZE, Enemy.BOSS_SIZE);
+				if (jetRect.overlaps(bossRect)) {
+					jet.setState(Jet.State.DYING);
+					jet.setStateTime(0);
+					world.downgradeDmgJet();
+				}
+			}
+
 		}
 	}
 
@@ -271,13 +292,52 @@ public class WorldController {
 					break;
 				}
 			}
+
+		}
+		world.getJetShots().removeAll(shotsHit);
+		shotsHit.removeAll(shotsHit);
+		if (world.getBoss() != null) {
+			Rectangle bossRect = new Rectangle(world.getBoss().getPosition().x,
+					world.getBoss().getPosition().y, Enemy.BOSS_SIZE,
+					Enemy.BOSS_SIZE);
+
+			// if enemy collides the bullet, make him disappear
+			for (Bullet shot : world.getJetShots()) {
+				if (shot == null)
+					continue;
+				else {
+					shot.getBounds().x = shot.getPosition().x;
+					shot.getBounds().y = shot.getPosition().y;
+				}
+				if (bossRect.overlaps(shot.getBounds())
+						&& world.getBoss().getState() == Enemy.State.MOVING) {
+					world.getBoss().setHp(
+							world.getBoss().getHp() - jet.getDamage());
+					shotsHit.add(shot);
+					if (world.getBoss().getHp() <= 0) {
+						world.getBoss().setState(Enemy.State.DYING);
+						world.getBoss().setStateTime(0);
+						world.setKillCount(world.getKillCount() + 1);
+						world.upDmgJet();
+
+					}
+
+					break;
+				}
+			}
 		}
 		world.getJetShots().removeAll(shotsHit);
 	}
 
+	/*
+	 * public void moveAllenemies(float delta) { for (Enemy enemy :
+	 * world.getEnemies()) { if (enemy.getMoveType() == Enemy.MoveType.NORMAL) {
+	 * moveNormalEnemies(delta, enemy); } else { moveSpecialEnemies(delta,
+	 * enemy); } } }
+	 */
+
 	public void moveNormalEnemies(float delta) {
 		for (Enemy enemy : world.getEnemies()) {
-
 			enemy.getVelocity().x = Enemy.NORMAL_SPEED;
 			enemy.getVelocity().y = enemy.getyDirection();
 			enemy.getPosition().add(enemy.getVelocity());
@@ -286,14 +346,13 @@ public class WorldController {
 
 	public void moveSpecialEnemies(float delta) {
 		for (Enemy enemy : world.getSpecialEnemies()) {
-
 			enemy.getVelocity().x = Enemy.SPECIAL_SPEED;
 			float jetyPosition = jet.getPosition().y;
 			float jetxPosition = jet.getPosition().x;
 			if (jetxPosition <= enemy.getPosition().x) {
 				enemy.getAcceleration().x = Enemy.SPECIAL_ACCELERATION;
 				enemy.setyDirection(0);
-				;
+
 			} else {
 				if (jetyPosition > enemy.getPosition().y) {
 					enemy.setyDirection(Enemy.SPECIAL_SPEED);
@@ -307,6 +366,35 @@ public class WorldController {
 			enemy.getVelocity().y = enemy.getyDirection();
 			enemy.getVelocity().add(enemy.getAcceleration());
 			enemy.getPosition().add(enemy.getVelocity());
+		}
+
+	}
+
+	public void moveBoss(float delta) {
+		if (world.getBoss() != null) {
+			if (world.getBoss().getPosition().x < Enemy.BOSS_LIMIT) {
+				world.getBoss().getVelocity().x = Enemy.BOSS_SPEED;
+				world.getBoss().getVelocity().y = world.getBoss()
+						.getyDirection();
+				world.getBoss().getPosition()
+						.add(world.getBoss().getVelocity());
+			} else {
+				world.getBoss().getVelocity().x = 0;
+				float jetyPosition = jet.getPosition().y;
+				if (jetyPosition > world.getBoss().getPosition().y
+						+ Enemy.BOSS_SIZE / 2) {
+					world.getBoss().setyDirection(Enemy.BOSS_SPEED);
+				} else if (jetyPosition < world.getBoss().getPosition().y
+						+ Enemy.BOSS_SIZE / 2) {
+					world.getBoss().setyDirection(-Enemy.BOSS_SPEED);
+				} else {
+					world.getBoss().setyDirection(0);
+				}
+				world.getBoss().getVelocity().y = world.getBoss()
+						.getyDirection();
+				world.getBoss().getPosition()
+						.add(world.getBoss().getVelocity());
+			}
 		}
 	}
 

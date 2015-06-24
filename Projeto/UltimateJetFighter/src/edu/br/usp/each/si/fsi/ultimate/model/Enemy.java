@@ -7,13 +7,23 @@ import com.badlogic.gdx.math.Vector2;
 
 public class Enemy {
 	
+	
 	public enum State{MOVING,DYING};
 	public enum MoveType{NORMAL, SPECIAL};
+	public final int ID_NORMAL = 1, ID_SPECIAL = 2; 
 	
 	private EnemyType type;
 
 	public static final float NORMAL_SPEED = 0.02f; // unit per second
 	public static final float SPECIAL_SPEED = 0.01f; // unit per second
+	
+	//boss' attributes
+	public static final float BOSS_SPEED = 0.01f;
+	public static final float BOSS_SIZE = 2f;
+	public static final int BOSS_LIMIT = 1;
+	//
+	
+	
 	public static final float SPECIAL_ACCELERATION = 0.05f; // unit per second
 	public static final float SIZE = 0.5f; // half a unit
 	public static final int HP = 10;
@@ -43,6 +53,8 @@ public class Enemy {
 	
 
 	State state = State.MOVING;
+	private MoveType moveType;
+	
 
 	private Shot shot;
 
@@ -55,6 +67,7 @@ public class Enemy {
 		this.shot = shot;
 		this.setTimerShot(timerShot);
 		this.setPreviousShot(Gdx.graphics.getRawDeltaTime());
+		
 	}
 	
 	public Enemy(){
@@ -107,6 +120,7 @@ public class Enemy {
 
 	public void setId_enemy_type(int id_enemy_type) {
 		this.id_enemy_type = id_enemy_type;
+		
 	}
 	
 	public Shot getShot(){
@@ -115,6 +129,14 @@ public class Enemy {
 	
 	public void setShot(Shot shot){
 		this.shot = shot;
+	}
+
+	public MoveType getMoveType() {
+		return moveType;
+	}
+
+	public void setMoveType(MoveType moveType) {
+		this.moveType = moveType;
 	}
 
 	public double getHp() {
@@ -177,6 +199,11 @@ public class Enemy {
 
 	public void setType(EnemyType type) {
 		this.type = type;
+		if(this.type.getId() == ID_NORMAL){
+			moveType = MoveType.NORMAL;
+		}else{
+			moveType = MoveType.SPECIAL;
+		}
 	}
 	
 

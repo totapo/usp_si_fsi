@@ -63,7 +63,7 @@ public class WorldRenderer {
 	// frames for animations
 	private TextureRegion jetFrame;
 	private TextureRegion enemyFrame;
-	
+
 	float time;
 	private Texture enemyShotTexture;
 	private Texture squareTexture;
@@ -93,9 +93,8 @@ public class WorldRenderer {
 
 	public WorldRenderer(World world, boolean debug) {
 		this.world = world;
-		lvlLoader = new LevelLoader();
-		world.setLevel(lvlLoader.loadLevel(world.getJet(), 1));
-		time=0;
+		// lvlLoader = new LevelLoader();
+		time = 0;
 		this.cam = new OrthographicCamera(CAMERA_WIDTH, CAMERA_HEIGHT);
 		this.cam.position.set(CAMERA_WIDTH / 2f, CAMERA_HEIGHT / 2f, 0);
 		this.cam.update();
@@ -117,7 +116,8 @@ public class WorldRenderer {
 		specialEnemyTexture = new Texture(
 				Gdx.files.internal("images/specialEnemy.png"));
 		shotTexture = new Texture(Gdx.files.internal("images/shot.png"));
-		enemyShotTexture = new Texture(Gdx.files.internal("images/enemyShotTest.png"));
+		enemyShotTexture = new Texture(
+				Gdx.files.internal("images/enemyShotTest.png"));
 		squareTexture = new Texture(Gdx.files.internal("images/quadrado.png"));
 	}
 
@@ -154,6 +154,7 @@ public class WorldRenderer {
 		drawJet();
 		drawSpecialEnemies();
 		drawNormalEnemies();
+		drawBoss(world.getBoss());
 		drawJetShots();
 		drawEnemyShots();
 		spriteBatch.end();
@@ -163,65 +164,53 @@ public class WorldRenderer {
 		drawHud();
 		this.hudBatch.end();
 	}
-	
+
 	private void drawEnemyShots() {
 		for (Bullet bullet : world.getEnemiesShots()) {
-			spriteBatch.draw(
-					enemyShotTexture, 
-					bullet.getPosition().x* ppuX,
-					bullet.getPosition().y * ppuY,
-					bullet.getSize()/2, 
-					bullet.getSize()/2,
-					bullet.getSize() * ppuX,
-					bullet.getSize()* ppuY,
-					1,1,
-					bullet.getAngle()-90,
-					0,0,
-					enemyShotTexture.getWidth(),
-					enemyShotTexture.getHeight(),
-					false,false);
+			spriteBatch.draw(enemyShotTexture, bullet.getPosition().x * ppuX,
+					bullet.getPosition().y * ppuY, bullet.getSize() / 2,
+					bullet.getSize() / 2, bullet.getSize() * ppuX,
+					bullet.getSize() * ppuY, 1, 1, bullet.getAngle() - 90, 0,
+					0, enemyShotTexture.getWidth(),
+					enemyShotTexture.getHeight(), false, false);
 		}
 	}
 
-	private void drawHud(){
-		hudBatch.draw(enemyTexture, 0.1f * ppuX,
-					0.1f * ppuY, Enemy.SIZE * ppuX, Enemy.SIZE
-							* ppuY);
-		hudBatch.draw(num.DDOTS.getTexture(),(0.1f)* ppuX,
-				Enemy.SIZE * ppuY, Enemy.SIZE * ppuX, Enemy.SIZE
-				* ppuY);
+	private void drawHud() {
+		hudBatch.draw(enemyTexture, 0.1f * ppuX, 0.1f * ppuY,
+				Enemy.SIZE * ppuX, Enemy.SIZE * ppuY);
+		hudBatch.draw(num.DDOTS.getTexture(), (0.1f) * ppuX, Enemy.SIZE * ppuY,
+				Enemy.SIZE * ppuX, Enemy.SIZE * ppuY);
 		int kills = world.getKillCount();
-		int[] positions=new int[(kills+"").length()];
-		for(int i=positions.length-1;i>-1;i--){
-			positions[i]=kills%10;
-			kills = kills/10;
+		int[] positions = new int[(kills + "").length()];
+		for (int i = positions.length - 1; i > -1; i--) {
+			positions[i] = kills % 10;
+			kills = kills / 10;
 		}
-		float aux=Enemy.SIZE+Enemy.SIZE/2;
-		for(int a : positions){
-			hudBatch.draw(Numbers.values()[a].getTexture(), 0.1f * ppuX,
-					aux * ppuY, Enemy.SIZE * ppuX, Enemy.SIZE
-							* ppuY);
-			aux+=Enemy.SIZE/2;
+		float aux = Enemy.SIZE + Enemy.SIZE / 2;
+		for (int a : positions) {
+			hudBatch.draw(Numbers.values()[a].getTexture(), 0.1f * ppuX, aux
+					* ppuY, Enemy.SIZE * ppuX, Enemy.SIZE * ppuY);
+			aux += Enemy.SIZE / 2;
 		}
 		Jet jet = world.getJet();
-		hudBatch.draw(squareTexture, (jet.getPosition().x+jet.getSize()/2-jet.getSize()/8) * ppuX,
-				(jet.getPosition().y+jet.getSize()/2-jet.getSize()/8)*ppuY,
-				jet.getSize()/4*ppuX,jet.getSize()/4*ppuY);
-		/*time += Gdx.graphics.getRawDeltaTime();
-		int minutes = ((int)time) / 60;
-	    int seconds = ((int)time) % 60;
-	    positions=new int[(minutes+"").length()];
-		aux = positions.length * Enemy.SIZE/2;
-		for(int a : positions){
-			hudBatch.draw(Numbers.values()[a].getTexture(), 0.1f * ppuX,
-					(aux-7) * ppuY, Enemy.SIZE * ppuX, Enemy.SIZE
-							* ppuY);
-			aux+=Enemy.SIZE/2;
-		}
-		hudBatch.draw(num.DDOTS.getTexture(),(0.1f)* ppuX,
-				Enemy.SIZE * ppuY, Enemy.SIZE * ppuX, Enemy.SIZE
-				* ppuY);*/
-		
+		hudBatch.draw(squareTexture,
+				(jet.getPosition().x + jet.getSize() / 2 - jet.getSize() / 8)
+						* ppuX,
+				(jet.getPosition().y + jet.getSize() / 2 - jet.getSize() / 8)
+						* ppuY, jet.getSize() / 4 * ppuX, jet.getSize() / 4
+						* ppuY);
+		/*
+		 * time += Gdx.graphics.getRawDeltaTime(); int minutes = ((int)time) /
+		 * 60; int seconds = ((int)time) % 60; positions=new
+		 * int[(minutes+"").length()]; aux = positions.length * Enemy.SIZE/2;
+		 * for(int a : positions){
+		 * hudBatch.draw(Numbers.values()[a].getTexture(), 0.1f * ppuX, (aux-7)
+		 * * ppuY, Enemy.SIZE * ppuX, Enemy.SIZE ppuY); aux+=Enemy.SIZE/2; }
+		 * hudBatch.draw(num.DDOTS.getTexture(),(0.1f)* ppuX, Enemy.SIZE * ppuY,
+		 * Enemy.SIZE * ppuX, Enemy.SIZE ppuY);
+		 */
+
 	}
 
 	private void drawBlocks() {
@@ -254,7 +243,7 @@ public class WorldRenderer {
 		}
 		world.getEnemies().removeAll(enemiesDead);
 	}
-	
+
 	private void drawSpecialEnemies() {
 		List<Enemy> enemiesDead = new ArrayList<Enemy>();
 		for (Enemy enemy : world.getSpecialEnemies()) {
@@ -270,56 +259,63 @@ public class WorldRenderer {
 				}
 
 			} else {
-				spriteBatch.draw(specialEnemyTexture, enemy.getPosition().x * ppuX,
-						enemy.getPosition().y * ppuY, Enemy.SIZE * ppuX,
-						Enemy.SIZE * ppuY);
+				spriteBatch.draw(specialEnemyTexture, enemy.getPosition().x
+						* ppuX, enemy.getPosition().y * ppuY,
+						Enemy.SIZE * ppuX, Enemy.SIZE * ppuY);
 			}
 		}
 		world.getSpecialEnemies().removeAll(enemiesDead);
+	}
+
+	private void drawBoss(Enemy boss) {
+		if (boss != null) {
+			if (boss.getState() == Enemy.State.DYING) {
+				enemyFrame = deathAnimation.getKeyFrame(boss.getStateTime(),
+						true);
+
+				spriteBatch.draw(enemyFrame, boss.getPosition().x * ppuX,
+						boss.getPosition().y * ppuY, Enemy.BOSS_SIZE * ppuX,
+						Enemy.BOSS_SIZE * ppuY);
+				if (deathAnimation.isAnimationFinished(boss.getStateTime())) {
+					world.setBoss(null);
+				}
+
+			} else {
+				spriteBatch.draw(specialEnemyTexture, boss.getPosition().x
+						* ppuX, boss.getPosition().y * ppuY, Enemy.BOSS_SIZE
+						* ppuX, Enemy.BOSS_SIZE * ppuY);
+			}
+		}
 	}
 
 	private void drawJet() {
 		Jet jet = world.getJet();
 		if (jet.getState() != Jet.State.DYING) {
 			jetFrame = jetAnimation.getKeyFrame(jet.getStateTime(), true);
-		}else{
+		} else {
 			jetFrame = deathAnimation.getKeyFrame(jet.getStateTime(), true);
-			if(deathAnimation.isAnimationFinished(jet.getStateTime())){
+			if (deathAnimation.isAnimationFinished(jet.getStateTime())) {
 				jet.setState(Jet.State.IDLE);
 				jet.getPosition().set(new Vector2(7, 3));
 			}
 		}
-		
+
 		spriteBatch.draw(jetFrame, jet.getPosition().x * ppuX,
-				jet.getPosition().y * ppuY, jet.getSize() * ppuX, jet.getSize() * ppuY);
+				jet.getPosition().y * ppuY, jet.getSize() * ppuX, jet.getSize()
+						* ppuY);
 	}
 
 	private void drawJetShots() {
 		for (Bullet bullet : world.getJetShots()) {
-			spriteBatch.draw(
-					shotTexture, 
-					(bullet.getPosition().x)* ppuX,
-					(bullet.getPosition().y) * ppuY,
-					bullet.getSize()/2, 
-					bullet.getSize()/2,
-					bullet.getSize() * ppuX,
-					bullet.getSize()* ppuY,
-					1,1,
-					bullet.getAngle()-90,
-					0,0,
-					shotTexture.getWidth(),
-					shotTexture.getHeight(),
-					false,false);
+			spriteBatch.draw(shotTexture, (bullet.getPosition().x) * ppuX,
+					(bullet.getPosition().y) * ppuY, bullet.getSize() / 2,
+					bullet.getSize() / 2, bullet.getSize() * ppuX,
+					bullet.getSize() * ppuY, 1, 1, bullet.getAngle() - 90, 0,
+					0, shotTexture.getWidth(), shotTexture.getHeight(), false,
+					false);
 			/*
-			texture,
-			x,
-			y,
-			orign x e y,
-			width height, 
-			scalex e y, 
-			rotation, 
-			srcX, srcY, 
-			srcwidthheight, bool flipxy
+			 * texture, x, y, orign x e y, width height, scalex e y, rotation,
+			 * srcX, srcY, srcwidthheight, bool flipxy
 			 */
 		}
 	}

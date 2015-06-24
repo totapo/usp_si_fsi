@@ -22,14 +22,13 @@ public class StageInfoDAO {
 		SAXBuilder builder = new SAXBuilder();
 
 		try {
-			StageEnemyInfo enemyInfo = new StageEnemyInfo();
 			Document document = (Document) builder.build(STORAGE_FILE);
 			Element rootNode = document.getRootElement();
 			List<Element> list = rootNode.getChildren("enemy_info");
 
 			for (int i = 0; i < list.size(); i++) {
 				Element node = (Element) list.get(i);
-
+				StageEnemyInfo enemyInfo = new StageEnemyInfo();
 				enemyInfo.setMax_number(Integer.parseInt(node.getChildText("max_number")));
 				enemyInfo.setId_shot(Integer.parseInt(node.getChildText("id_shot")));
 				enemyInfo.setId_enemy(Integer.parseInt(node.getChildText("id_enemy")));

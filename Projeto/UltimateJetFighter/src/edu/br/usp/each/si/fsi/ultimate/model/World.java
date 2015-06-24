@@ -16,6 +16,7 @@ public class World {
 	/** The special enemies that are in the world **/
 	ArrayList<Enemy> specialEnemies = new ArrayList<Enemy>();
 	/** Our player controlled hero **/
+	Enemy boss;
 	Jet jet;
 	/** Contains all the jet's shots/bullets that are on screen */
 	ArrayList<Bullet> jetShots = new ArrayList<Bullet>();
@@ -30,6 +31,14 @@ public class World {
 
 	public ArrayList<Block> getBlocks() {
 		return blocks;
+	}
+
+	public Enemy getBoss() {
+		return boss;
+	}
+
+	public void setBoss(Enemy boss) {
+		this.boss = boss;
 	}
 
 	public ArrayList<Enemy> getEnemies() {
@@ -113,44 +122,87 @@ public class World {
 	}
 
 	public void shoot(Object source) {
-		Shot shot; Bullet bullet;
+		Shot shot;
+		Bullet bullet;
 		if (source instanceof Jet) {
-			shot =((Jet) source).getShot();
-			for(int i=0; i<shot.getBulletsPerClick();i++){
-				bullet = new Bullet(shot.getStartingAngle()+shot.getAngle()*i,shot.getSpeed(),jet.getPosition().cpy(),shot.getSize());
-				bullet.getPosition().y += jet.getSize() / 2 - bullet.getSize() / 2;
+			shot = ((Jet) source).getShot();
+			for (int i = 0; i < shot.getBulletsPerClick(); i++) {
+				bullet = new Bullet(shot.getStartingAngle() + shot.getAngle()
+						* i, shot.getSpeed(), jet.getPosition().cpy(),
+						shot.getSize());
+				bullet.getPosition().y += jet.getSize() / 2 - bullet.getSize()
+						/ 2;
 				this.jetShots.add(bullet);
 			}
 		} else {
-			Enemy enemy = (Enemy)source;
+			Enemy enemy = (Enemy) source;
 			shot = enemy.getShot();
-			if(shot.isMultiAction()){
-				for(int i=0; i<shot.getBulletsPerClick();i++){
-					bullet = new Bullet(shot.getStartingAngle()+shot.getAngle()*i,shot.getSpeed(),enemy.getPosition().cpy(),shot.getSize());
-					
-					bullet.getPosition().y += enemy.getSize() / 2 - bullet.getSize() / 2;
-					bullet.getPosition().x += enemy.getSize()-bullet.getSize();
+			if (shot.isMultiAction()) {
+				for (int i = 0; i < shot.getBulletsPerClick(); i++) {
+					bullet = new Bullet(shot.getStartingAngle()
+							+ shot.getAngle() * i, shot.getSpeed(), enemy
+							.getPosition().cpy(), shot.getSize());
+
+					bullet.getPosition().y += enemy.getSize() / 2
+							- bullet.getSize() / 2;
+					bullet.getPosition().x += enemy.getSize()
+							- bullet.getSize();
 					this.enemiesShots.add(bullet);
 				}
 			} else {
-				bullet = new Bullet(shot.getStartingAngle()+shot.getAngle(),shot.getSpeed(),enemy.getPosition().cpy(),shot.getSize());
-				bullet.getPosition().y += enemy.getSize() / 2 - bullet.getSize() / 2;
-				bullet.getPosition().x += enemy.getSize()-bullet.getSize();
-				shot.setStartingAngle(shot.getStartingAngle()+shot.getAngle());
+				bullet = new Bullet(shot.getStartingAngle() + shot.getAngle(),
+						shot.getSpeed(), enemy.getPosition().cpy(),
+						shot.getSize());
+				bullet.getPosition().y += enemy.getSize() / 2
+						- bullet.getSize() / 2;
+				bullet.getPosition().x += enemy.getSize() - bullet.getSize();
+				shot.setStartingAngle(shot.getStartingAngle() + shot.getAngle());
 				this.enemiesShots.add(bullet);
 			}
-			
+
 		}
 	}
 
 	private void createDemoWorld() {
 		jet = new Jet(new Vector2(3, 5), new Shot(new Vector2(0, 0),
-				"images/shot.png",-8f,true));
+				"images/shot.png", -8f, true));
 		jet.getShot().setBulletsPerClick(3);
-		jet.getShot().setAngle(15f);//30f);
+		jet.getShot().setAngle(15f);// 30f);
 		jet.getShot().setStartingAngle(75f);
 		level = new Level();
 		// this.blocks = getDrawableBlocks(level.getWidth(), level.getHeight());
+	}
+
+	public void createAllenemies() {
+		if (enemies.isEmpty()) {
+			int nrTypeEnemies = level.getEnemies().size();
+			for (int i = 0; i < nrTypeEnemies; i++) {
+				Random rd = new Random();
+				int nrEnemies = rd.nextInt(level.getEnemies().get(i)
+						.getMaxNumber());
+				List<Integer> positions = new ArrayList<Integer>();
+				for (int j = 0; j < level.getHeight(); j++) {
+					positions.add(j);
+				}
+
+				while (nrEnemies > 0) {
+					Collections.shuffle(positions);
+					int yPosition = positions.get(0);
+					positions.remove(0);
+					nrEnemies--;
+
+					Enemy enemy = new Enemy(new Vector2(-2, yPosition),
+							new Shot(new Vector2(0, 0),
+									"images/enemyShotTest.png", 3f, true), 1f);
+					enemy.getShot().setAngle(15);
+					enemy.getShot().setStartingAngle(75);
+					enemy.getShot().setBulletsPerClick(3);
+
+					enemies.add(enemy);
+				}
+			}
+
+		}
 	}
 
 	public void createNormalEnemies() {
@@ -175,9 +227,9 @@ public class World {
 				positions.remove(0);
 				nrEnemies--;
 
-				Enemy enemy = new Enemy(new Vector2(-2, yPosition),new Shot(new Vector2(0, 0),
-						"images/enemyShotTest.png",3f,true),
-						1f);
+				Enemy enemy = new Enemy(new Vector2(-2, yPosition),
+						new Shot(new Vector2(0, 0), "images/enemyShotTest.png",
+								3f, true), 1f);
 				enemy.getShot().setAngle(15);
 				enemy.getShot().setStartingAngle(75);
 				enemy.getShot().setBulletsPerClick(3);
@@ -193,25 +245,35 @@ public class World {
 	public void createSpecialEnemies() {
 		if (specialEnemies.size() == 0) {
 
-			/*
-			 * List<Integer> positions = new ArrayList<Integer>(); for (int i =
-			 * 0; i < level.getHeight(); i++) { if (!specialEnemies.contains(i))
-			 * { positions.add(i); } }
-			 */
 			Random rd = new Random();
 
 			int yPosition = rd.nextInt(level.getHeight());
 
-			Enemy enemy = new Enemy(new Vector2(-2, yPosition),new Shot(new Vector2(-2, yPosition),
-					"images/enemyShotTest.png",4f,false),
-					0.02f);
+			Enemy enemy = new Enemy(new Vector2(-2, yPosition), new Shot(
+					new Vector2(-2, yPosition), "images/enemyShotTest.png", 4f,
+					false), 0.02f);
 			enemy.getShot().setAngle(10);
 			enemy.getShot().setStartingAngle(0);
 			enemy.getShot().setBulletsPerClick(36);
-			//enemy.setType(Enemy.EnemyType.SPECIAL);
+			// enemy.setType(Enemy.EnemyType.SPECIAL);
 			enemy.setHp(Enemy.HP * 2);
 			specialEnemies.add(enemy);
 
+		}
+
+	}
+
+	public void createBoss(float delta) {
+		if (boss == null) {
+			int yPosition;
+			Random rd = new Random();
+			yPosition = (int) (rd
+					.nextInt((int) (level.getHeight() - 2 * Enemy.BOSS_SIZE)) + Enemy.BOSS_SIZE);
+
+			this.boss = new Enemy(new Vector2(-2, yPosition), new Shot(
+					new Vector2(-2, yPosition), "images/enemyShotTest.png", 4f,
+					false), 0.02f);
+			this.boss.setHp(Enemy.HP * 40);
 		}
 
 	}
@@ -276,43 +338,56 @@ public class World {
 	public void upDmgJet() {
 		int bull = jet.getShot().getBulletsPerClick();
 		bull++;
-		if(bull<=5)jet.getShot().setBulletsPerClick(bull);
-		switch(bull){
-		case 1: 
-			jet.getShot().setStartingAngle(90);break;
+		if (bull <= 5)
+			jet.getShot().setBulletsPerClick(bull);
+		switch (bull) {
+		case 1:
+			jet.getShot().setStartingAngle(90);
+			break;
 		case 2:
 			jet.getShot().setAngle(20);
-			jet.getShot().setStartingAngle(80);break;
+			jet.getShot().setStartingAngle(80);
+			break;
 		case 3:
 			jet.getShot().setAngle(15);
-			jet.getShot().setStartingAngle(75);break;
+			jet.getShot().setStartingAngle(75);
+			break;
 		case 4:
 			jet.getShot().setAngle(10);
-			jet.getShot().setStartingAngle(80);break;
+			jet.getShot().setStartingAngle(80);
+			break;
 		case 5:
 			jet.getShot().setAngle(5);
-			jet.getShot().setStartingAngle(80);break;
-		default:break;
+			jet.getShot().setStartingAngle(80);
+			break;
+		default:
+			break;
 		}
 	}
 
 	public void downgradeDmgJet() {
 		int bull = jet.getShot().getBulletsPerClick();
 		bull--;
-		if(bull>=1)jet.getShot().setBulletsPerClick(bull);
-		switch(bull){
-		case 1: 
-			jet.getShot().setStartingAngle(90);break;
+		if (bull >= 1)
+			jet.getShot().setBulletsPerClick(bull);
+		switch (bull) {
+		case 1:
+			jet.getShot().setStartingAngle(90);
+			break;
 		case 2:
 			jet.getShot().setAngle(20);
-			jet.getShot().setStartingAngle(80);break;
+			jet.getShot().setStartingAngle(80);
+			break;
 		case 3:
 			jet.getShot().setAngle(10);
-			jet.getShot().setStartingAngle(75);break;
+			jet.getShot().setStartingAngle(75);
+			break;
 		case 4:
 			jet.getShot().setAngle(10);
-			jet.getShot().setStartingAngle(80);break;
-		default:break;
+			jet.getShot().setStartingAngle(80);
+			break;
+		default:
+			break;
 		}
 	}
 }
