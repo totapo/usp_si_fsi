@@ -59,10 +59,10 @@ public class Enemy {
 	private Shot shot;
 
 
-	public Enemy(Vector2 position, Shot shot, double timerShot) {
+	public Enemy(Vector2 position, Shot shot, double timerShot, boolean isBoss) {
 		this.position = position;
-		this.bounds.height = SIZE;
-		this.bounds.width = SIZE;
+		this.bounds.height = (isBoss)? BOSS_SIZE:SIZE;
+		this.bounds.width = (isBoss)? BOSS_SIZE:SIZE;
 		hp = HP;
 		this.shot = shot;
 		this.setTimerShot(timerShot);

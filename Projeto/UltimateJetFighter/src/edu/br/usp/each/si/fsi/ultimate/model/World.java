@@ -181,13 +181,11 @@ public class World {
 				Gdx.app.debug("Enemy", "bomb phase "+shot.getPhases()+": "+shot.getBullets());
 				bullet = new Bullet(shot.getAngle()+shot.getVariationAngle()*i,shot.velocity.len(),
 						shot.getPosition().cpy(),shot.getSize()/2,ActionType.MULTI);
-			
-			
 				bullet.getPosition().y += shot.getSize() / 4;
 				bullet.getPosition().x += shot.getSize()/4;
 				bullet.setSpin(shot.isSpin());
-				this.enemiesShots.add(bullet);
 			}
+			this.enemiesShots.add(bullet);
 		}
 	}
 
@@ -230,7 +228,7 @@ public class World {
 
 					Enemy enemy = new Enemy(new Vector2(-2, yPosition),new Shot(new Vector2(0, 0),
 							"images/enemyShotTest.png",3f,ActionType.MULTI),
-							1f);
+							1f,false);
 					enemy.getShot().setAngle(15);
 					enemy.getShot().setStartingAngle(75);
 					enemy.getShot().setBulletsPerClick(3);
@@ -266,7 +264,7 @@ public class World {
 
 				Enemy enemy = new Enemy(new Vector2(-2, yPosition),new Shot(new Vector2(0, 0),
 						"images/enemyShotTest.png",3f,ActionType.MULTI),
-						1f);
+						1f,false);
 				enemy.getShot().setAngle(15);
 				enemy.getShot().setStartingAngle(75);
 				enemy.getShot().setBulletsPerClick(3);
@@ -286,16 +284,13 @@ public class World {
 
 			int yPosition = rd.nextInt(level.getHeight());
 			// enemy.setType(Enemy.EnemyType.SPECIAL);
-			//Enemy enemy = new Enemy(new Vector2(-2, yPosition),new Shot(new Vector2(-2, yPosition),
-			//		"images/enemyShotTest.png",4f,ActionType.PROGRESSING),
-			//		0.02f);
 			Enemy enemy = new Enemy(new Vector2(-2, yPosition),new Shot(new Vector2(-2, yPosition),
-					"images/enemyShotTest.png",2f,ActionType.BOMB,0.5f,2),
-					5f);
-			enemy.getShot().setAngle(30);
-			enemy.getShot().setTimer(1);
+					"images/enemyShotTest.png",4f,ActionType.PROGRESSING),
+					0.04f,false);
+			enemy.getShot().setAngle(10);
+			//enemy.getShot().setTimer(1);
 			enemy.getShot().setStartingAngle(90);
-			enemy.getShot().setBulletsPerClick(12);
+			enemy.getShot().setBulletsPerClick(36);
 			enemy.setHp(Enemy.HP * 2);
 			specialEnemies.add(enemy);
 
@@ -311,7 +306,11 @@ public class World {
 					.nextInt((int) (level.getHeight() - 2 * Enemy.BOSS_SIZE)) + Enemy.BOSS_SIZE);
 
 			this.boss = new Enemy(new Vector2(-2, yPosition), new Shot(new Vector2(-2, yPosition),
-					"images/enemyShotTest.png",2f,ActionType.BOMB,0.5f,2), 5f);
+					"images/enemyShotTest.png",2f,ActionType.BOMB,0.5f,2), 5f, true);
+			boss.getShot().setAngle(30);
+			boss.getShot().setTimer(1);
+			boss.getShot().setStartingAngle(90);
+			boss.getShot().setBulletsPerClick(12);
 			this.boss.setHp(Enemy.HP * 40);
 		}
 

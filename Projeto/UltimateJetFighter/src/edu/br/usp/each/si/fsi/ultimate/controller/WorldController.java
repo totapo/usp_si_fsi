@@ -94,7 +94,6 @@ public class WorldController {
 	/** The main update method **/
 	public void update(float delta) {
 		processInput();
-		time += Gdx.graphics.getRawDeltaTime();
 		time+=Gdx.graphics.getRawDeltaTime();
 		//checkCollisionWithBlocks(delta);
 		//checkCollisionBetweenShots(delta); retirei essa colisao
@@ -110,8 +109,8 @@ public class WorldController {
 		world.updateEnemies(delta);
 		world.updateSpecialEnemies(delta);
 		world.updateJetShots(delta);
-		// world.createNormalEnemies();
-		// world.createSpecialEnemies();
+		world.createNormalEnemies();
+		world.createSpecialEnemies();
 		if (createBoss) {
 			world.createBoss(delta);
 			createBoss = false;
@@ -136,6 +135,12 @@ public class WorldController {
 			if(time-enemy.getPreviousShot()>=enemy.getTimerShot()){
 				world.shoot(enemy,time);
 				enemy.setPreviousShot(time);
+			}
+		}
+		if(world.getBoss()!=null){
+			if(time-world.getBoss().getPreviousShot()>=world.getBoss().getTimerShot()){
+				world.shoot(world.getBoss(),time);
+				world.getBoss().setPreviousShot(time);
 			}
 		}
 	}
