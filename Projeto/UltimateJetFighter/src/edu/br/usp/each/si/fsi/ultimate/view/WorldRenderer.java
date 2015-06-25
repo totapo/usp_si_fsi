@@ -3,6 +3,7 @@ package edu.br.usp.each.si.fsi.ultimate.view;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -31,6 +32,8 @@ import edu.br.usp.each.si.fsi.ultimate.model.Item;
 import edu.br.usp.each.si.fsi.ultimate.model.Jet;
 import edu.br.usp.each.si.fsi.ultimate.model.Shot;
 import edu.br.usp.each.si.fsi.ultimate.model.World;
+import edu.br.usp.each.si.fsi.ultimate.screens.GameOverScreen;
+import edu.br.usp.each.si.fsi.ultimate.screens.GameScreen;
 
 public class WorldRenderer {
 	private static final float CAMERA_WIDTH = 10f;
@@ -113,7 +116,7 @@ public class WorldRenderer {
 		loadJetAnimations();
 		loadDeathAnimations();
 		loadTextures();
-		//loadItemAnimations(world.getItens());
+		// loadItemAnimations(world.getItens());
 	}
 
 	private void loadTextures() {
@@ -125,7 +128,8 @@ public class WorldRenderer {
 		specialEnemyTexture = new Texture(
 				Gdx.files.internal("images/specialEnemy.png"));
 		shotTexture = new Texture(Gdx.files.internal("images/shot.png"));
-		enemyShotTexture = new Texture(Gdx.files.internal("images/enemyShotTest.png"));
+		enemyShotTexture = new Texture(
+				Gdx.files.internal("images/enemyShotTest.png"));
 		enemyBombTexture = new Texture(Gdx.files.internal("images/bala.png"));
 		squareTexture = new Texture(Gdx.files.internal("images/quadrado.png"));
 	}
@@ -176,97 +180,97 @@ public class WorldRenderer {
 		this.hudBatch.end();
 		drawLifes();
 	}
-	
 
 	private void drawPlayerItens() {
 		Jet jet = world.getJet();
 		for (Item item : world.getPlayerItens()) {
-			spriteBatch.draw(item.getIconTexture(), jet.getPosition().x-item.getSize()/2,
-					jet.getPosition().y+item.getSize()/2, jet.getSize()+item.getSize()/2,
-					jet.getSize()+item.getSize()/2);
+			spriteBatch.draw(item.getIconTexture(),
+					jet.getPosition().x - item.getSize() / 2,
+					jet.getPosition().y + item.getSize() / 2, jet.getSize()
+							+ item.getSize() / 2,
+					jet.getSize() + item.getSize() / 2);
 		}
 	}
 
 	private void drawItens(ArrayList<Item> itens) {
 		for (Item item : itens) {
-			spriteBatch.draw(item.getIconTexture(), item.getPosition().x * ppuX,
-					item.getPosition().y * ppuY, item.getSize() * ppuX, item.getSize()
-					* ppuY);
+			spriteBatch.draw(item.getIconTexture(),
+					item.getPosition().x * ppuX, item.getPosition().y * ppuY,
+					item.getSize() * ppuX, item.getSize() * ppuY);
 		}
 	}
-	
+
 	private void drawEnemyShots() {
 		for (Bullet bullet : world.getEnemiesShots()) {
-			spriteBatch.draw(
-					((bullet.getActionType().equals(ActionType.BOMB))?enemyBombTexture:enemyShotTexture), 
-					bullet.getPosition().x* ppuX,
-					bullet.getPosition().y * ppuY,
-					(bullet.getSize()/2)*ppuX, 
-					(bullet.getSize()/2)*ppuY,
-					bullet.getSize() * ppuX,
-					bullet.getSize()* ppuY,
-					1,1,
-					bullet.getAngle()-90,
-					0,0,
-					enemyShotTexture.getWidth(),
-					enemyShotTexture.getHeight(),
-					false,false);
-			if(bullet.isSpin())bullet.setAngle(bullet.getAngle()+bullet.getVariationAngle());
+			spriteBatch
+					.draw(((bullet.getActionType().equals(ActionType.BOMB)) ? enemyBombTexture
+							: enemyShotTexture), bullet.getPosition().x * ppuX,
+							bullet.getPosition().y * ppuY,
+							(bullet.getSize() / 2) * ppuX,
+							(bullet.getSize() / 2) * ppuY, bullet.getSize()
+									* ppuX, bullet.getSize() * ppuY, 1, 1,
+							bullet.getAngle() - 90, 0, 0, enemyShotTexture
+									.getWidth(), enemyShotTexture.getHeight(),
+							false, false);
+			if (bullet.isSpin())
+				bullet.setAngle(bullet.getAngle() + bullet.getVariationAngle());
 		}
 	}
-	
 
 	private void drawLifes() {
 		debugRenderer.setProjectionMatrix(cam.combined);
 		debugRenderer.begin(ShapeType.Filled);
-		//DRAW JET LIFE
+		// DRAW JET LIFE
 		Jet jet = world.getJet();
 		int max = jet.getMaxLife();
 		int hp = jet.getLife();
-		Rectangle rectMax=new Rectangle();
-		rectMax.set((10-0.4f),(0.1f) , 0.2f, 6.8f);
+		Rectangle rectMax = new Rectangle();
+		rectMax.set((10 - 0.4f), (0.1f), 0.2f, 6.8f);
 		debugRenderer.setColor(Color.BLACK);
 		debugRenderer.rect(rectMax.x, rectMax.y, rectMax.width, rectMax.height);
 		debugRenderer.end();
-		if(hp>0){
+		if (hp > 0) {
 			debugRenderer.begin(ShapeType.Filled);
-			//6.8 = max, x = hp, max x = 6.8 hp, x = 6.8 * hp /max
-			Rectangle rectMin=new Rectangle();
-			rectMin.set((10-0.4f),(0.1f) , 0.2f, ((6.8f*hp)/max));
+			// 6.8 = max, x = hp, max x = 6.8 hp, x = 6.8 * hp /max
+			Rectangle rectMin = new Rectangle();
+			rectMin.set((10 - 0.4f), (0.1f), 0.2f, ((6.8f * hp) / max));
 			debugRenderer.setColor(Color.GREEN);
-			debugRenderer.rect(rectMin.x, rectMin.y, rectMin.width, rectMin.height);
+			debugRenderer.rect(rectMin.x, rectMin.y, rectMin.width,
+					rectMin.height);
 			debugRenderer.end();
 		}
-		
-		if(world.getBoss()!=null){
-			//DRAW BOSS LIFE
+
+		if (world.getBoss() != null) {
+			// DRAW BOSS LIFE
 			debugRenderer.setProjectionMatrix(cam.combined);
 			debugRenderer.begin(ShapeType.Filled);
 			Enemy boss = world.getBoss();
 			max = world.getBossMaxHp();
 			hp = (int) boss.getHp();
-			rectMax=new Rectangle();
-			rectMax.set((0.2f),(0.1f) , 0.2f, 6.8f);
+			rectMax = new Rectangle();
+			rectMax.set((0.2f), (0.1f), 0.2f, 6.8f);
 			debugRenderer.setColor(Color.BLACK);
-			debugRenderer.rect(rectMax.x, rectMax.y, rectMax.width, rectMax.height);
+			debugRenderer.rect(rectMax.x, rectMax.y, rectMax.width,
+					rectMax.height);
 			debugRenderer.end();
-			if(hp>0){
+			if (hp > 0) {
 				debugRenderer.begin(ShapeType.Filled);
-				//6.8 = max, x = hp, max x = 6.8 hp, x = 6.8 * hp /max
-				Rectangle rectMin=new Rectangle();
-				rectMin.set((0.2f),(0.1f) , 0.2f, ((6.8f*hp)/max));
+				// 6.8 = max, x = hp, max x = 6.8 hp, x = 6.8 * hp /max
+				Rectangle rectMin = new Rectangle();
+				rectMin.set((0.2f), (0.1f), 0.2f, ((6.8f * hp) / max));
 				debugRenderer.setColor(Color.RED);
-				debugRenderer.rect(rectMin.x, rectMin.y, rectMin.width, rectMin.height);
+				debugRenderer.rect(rectMin.x, rectMin.y, rectMin.width,
+						rectMin.height);
 				debugRenderer.end();
 			}
 		}
 	}
 
 	private void drawHud() {
-		hudBatch.draw(enemyTexture, (9-0.3f)  * ppuX, 0.1f * ppuY,
-				Enemy.SIZE * ppuX, Enemy.SIZE * ppuY);
-		hudBatch.draw(num.DDOTS.getTexture(), (9-0.3f) * ppuX, Enemy.SIZE * ppuY,
-				Enemy.SIZE * ppuX, Enemy.SIZE * ppuY);
+		hudBatch.draw(enemyTexture, (9 - 0.3f) * ppuX, 0.1f * ppuY, Enemy.SIZE
+				* ppuX, Enemy.SIZE * ppuY);
+		hudBatch.draw(num.DDOTS.getTexture(), (9 - 0.3f) * ppuX, Enemy.SIZE
+				* ppuY, Enemy.SIZE * ppuX, Enemy.SIZE * ppuY);
 		int kills = world.getKillCount();
 		int[] positions = new int[(kills + "").length()];
 		for (int i = positions.length - 1; i > -1; i--) {
@@ -275,8 +279,8 @@ public class WorldRenderer {
 		}
 		float aux = Enemy.SIZE + Enemy.SIZE / 2;
 		for (int a : positions) {
-			hudBatch.draw(Numbers.values()[a].getTexture(), (9-0.3f) * ppuX, aux
-					* ppuY, Enemy.SIZE * ppuX, Enemy.SIZE * ppuY);
+			hudBatch.draw(Numbers.values()[a].getTexture(), (9 - 0.3f) * ppuX,
+					aux * ppuY, Enemy.SIZE * ppuX, Enemy.SIZE * ppuY);
 			aux += Enemy.SIZE / 2;
 		}
 		Jet jet = world.getJet();
@@ -301,9 +305,9 @@ public class WorldRenderer {
 
 	private void drawLevel() {
 		world.getLevel().getBackground();
-		spriteBatch.draw(world.getLevel().getBackground(), 0,
-				0, world.getLevel().getWidth() * ppuX,
-				world.getLevel().getHeight() * ppuY);
+		spriteBatch.draw(world.getLevel().getBackground(), 0, 0, world
+				.getLevel().getWidth() * ppuX, world.getLevel().getHeight()
+				* ppuY);
 	}
 
 	private void drawNormalEnemies() {
@@ -363,6 +367,8 @@ public class WorldRenderer {
 						Enemy.BOSS_SIZE * ppuY);
 				if (deathAnimation.isAnimationFinished(boss.getStateTime())) {
 					world.setBoss(null);
+					((Game) Gdx.app.getApplicationListener())
+					.setScreen(new GameOverScreen(world.getKillCount()));
 				}
 
 			} else {
@@ -380,8 +386,8 @@ public class WorldRenderer {
 		} else {
 			jetFrame = deathAnimation.getKeyFrame(jet.getStateTime(), true);
 			if (deathAnimation.isAnimationFinished(jet.getStateTime())) {
-				jet.setState(Jet.State.IDLE);
-				jet.getPosition().set(new Vector2(7, 3));
+				((Game) Gdx.app.getApplicationListener())
+						.setScreen(new GameOverScreen(world.getKillCount()));
 			}
 		}
 

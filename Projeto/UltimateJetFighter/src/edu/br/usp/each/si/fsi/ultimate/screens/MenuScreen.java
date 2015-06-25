@@ -25,9 +25,9 @@ public class MenuScreen implements Screen {
 
 	private Skin skin = loadSkin();
 
-	private TextButton buttonPlay = new TextButton("", skin.get("start",
-			TextButtonStyle.class)), buttonExit = new TextButton("", skin.get(
-			"exit", TextButtonStyle.class));
+	private TextButton buttonPlay = new TextButton("", skin.get("play",
+			TextButtonStyle.class)), buttonScore = new TextButton("", skin.get(
+			"score", TextButtonStyle.class));
 
 	@Override
 	public void render(float delta) {
@@ -53,7 +53,7 @@ public class MenuScreen implements Screen {
 						.setScreen(new GameScreen());
 			}
 		});
-		buttonExit.addListener(new ClickListener() {
+		buttonScore.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				Gdx.app.exit();
@@ -64,7 +64,7 @@ public class MenuScreen implements Screen {
 		// The elements are displayed in the order you add them.
 		// The first appear on top, the last at the bottom.
 		table.add(buttonPlay).size(420, 120).padBottom(20).row();
-		table.add(buttonExit).size(420, 120).padBottom(20).row();
+		table.add(buttonScore).size(420, 120).padBottom(20).row();
 
 		table.setFillParent(true);
 		stage.addActor(table);
@@ -93,7 +93,7 @@ public class MenuScreen implements Screen {
 
 	public Skin loadSkin() {
 		Skin skin = new Skin();
-		Pixmap pixmapStart = new Pixmap(Gdx.files.internal("skins/start.png"));
+		Pixmap pixmapStart = new Pixmap(Gdx.files.internal("skins/play.jpg"));
 
 		skin.add("white", new Texture(pixmapStart));
 
@@ -106,10 +106,10 @@ public class MenuScreen implements Screen {
 		textButtonStyleStart.checked = skin.newDrawable("white", Color.BLUE);
 		textButtonStyleStart.over = skin.newDrawable("white", Color.LIGHT_GRAY);
 		textButtonStyleStart.font = skin.getFont("default");
-		skin.add("start", textButtonStyleStart);
+		skin.add("play", textButtonStyleStart);
 		
 		
-		Pixmap pixmapExit = new Pixmap(Gdx.files.internal("skins/exit.jpg"));
+		Pixmap pixmapExit = new Pixmap(Gdx.files.internal("skins/score.jpg"));
 		skin.add("black", new Texture(pixmapExit));
 		TextButtonStyle textButtonStyleExit = new TextButtonStyle();
 		textButtonStyleExit.up = skin.newDrawable("black", Color.WHITE);
@@ -117,7 +117,7 @@ public class MenuScreen implements Screen {
 		textButtonStyleExit.checked = skin.newDrawable("black", Color.BLUE);
 		textButtonStyleExit.over = skin.newDrawable("black", Color.LIGHT_GRAY);
 		textButtonStyleExit.font = skin.getFont("default");
-		skin.add("exit", textButtonStyleExit);
+		skin.add("score", textButtonStyleExit);
 		return skin;
 	}
 
