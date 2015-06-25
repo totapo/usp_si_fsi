@@ -17,6 +17,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
+import edu.br.usp.each.si.fsi.data.ScoreDAO;
 import edu.br.usp.each.si.fsi.ultimate.Numbers;
 import edu.br.usp.each.si.fsi.ultimate.controller.LevelLoader;
 import edu.br.usp.each.si.fsi.ultimate.model.Block;
@@ -367,6 +368,7 @@ public class WorldRenderer {
 						Enemy.BOSS_SIZE * ppuY);
 				if (deathAnimation.isAnimationFinished(boss.getStateTime())) {
 					world.setBoss(null);
+					ScoreDAO.ModifyScoreFile(world.getKillCount());
 					((Game) Gdx.app.getApplicationListener())
 					.setScreen(new GameOverScreen(world.getKillCount()));
 				}
@@ -379,6 +381,7 @@ public class WorldRenderer {
 		}
 	}
 
+
 	private void drawJet() {
 		Jet jet = world.getJet();
 		if (jet.getState() != Jet.State.DYING) {
@@ -386,6 +389,7 @@ public class WorldRenderer {
 		} else {
 			jetFrame = deathAnimation.getKeyFrame(jet.getStateTime(), true);
 			if (deathAnimation.isAnimationFinished(jet.getStateTime())) {
+				ScoreDAO.ModifyScoreFile(world.getKillCount());
 				((Game) Gdx.app.getApplicationListener())
 						.setScreen(new GameOverScreen(world.getKillCount()));
 			}

@@ -15,8 +15,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
 
 public class MenuScreen implements Screen {
 
@@ -28,6 +30,8 @@ public class MenuScreen implements Screen {
 	private TextButton buttonPlay = new TextButton("", skin.get("play",
 			TextButtonStyle.class)), buttonScore = new TextButton("", skin.get(
 			"score", TextButtonStyle.class));
+
+	
 
 	@Override
 	public void render(float delta) {
@@ -56,16 +60,18 @@ public class MenuScreen implements Screen {
 		buttonScore.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				Gdx.app.exit();
+				((Game) Gdx.app.getApplicationListener())
+						.setScreen(new RankingScreen());
 				// or System.exit(0);
 			}
 		});
 
 		// The elements are displayed in the order you add them.
 		// The first appear on top, the last at the bottom.
-		table.add(buttonPlay).size(420, 120).padBottom(20).row();
+		table.add(buttonPlay).align(Align.top).size(420, 120).padBottom(20)
+				.row();
 		table.add(buttonScore).size(420, 120).padBottom(20).row();
-
+		table.background(skin.newDrawable("menu"));
 		table.setFillParent(true);
 		stage.addActor(table);
 
@@ -107,8 +113,7 @@ public class MenuScreen implements Screen {
 		textButtonStyleStart.over = skin.newDrawable("white", Color.LIGHT_GRAY);
 		textButtonStyleStart.font = skin.getFont("default");
 		skin.add("play", textButtonStyleStart);
-		
-		
+
 		Pixmap pixmapExit = new Pixmap(Gdx.files.internal("skins/score.jpg"));
 		skin.add("black", new Texture(pixmapExit));
 		TextButtonStyle textButtonStyleExit = new TextButtonStyle();
@@ -118,6 +123,9 @@ public class MenuScreen implements Screen {
 		textButtonStyleExit.over = skin.newDrawable("black", Color.LIGHT_GRAY);
 		textButtonStyleExit.font = skin.getFont("default");
 		skin.add("score", textButtonStyleExit);
+
+		Pixmap pixmapMenu = new Pixmap(Gdx.files.internal("skins/menu.jpg"));
+		skin.add("menu", new Texture(pixmapMenu));
 		return skin;
 	}
 
