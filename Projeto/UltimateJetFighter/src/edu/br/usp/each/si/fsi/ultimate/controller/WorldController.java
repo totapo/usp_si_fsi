@@ -19,6 +19,7 @@ import edu.br.usp.each.si.fsi.ultimate.model.Enemy;
 import edu.br.usp.each.si.fsi.ultimate.model.Item;
 import edu.br.usp.each.si.fsi.ultimate.model.Jet;
 import edu.br.usp.each.si.fsi.ultimate.model.Jet.State;
+import edu.br.usp.each.si.fsi.ultimate.model.Shot;
 import edu.br.usp.each.si.fsi.ultimate.model.World;
 
 public class WorldController {
@@ -109,8 +110,8 @@ public class WorldController {
 		world.updateEnemies(delta);
 		world.updateSpecialEnemies(delta);
 		world.updateJetShots(delta);
-		world.createNormalEnemies();
-		world.createSpecialEnemies();
+		world.createNormalEnemies(createBoss);
+		world.createSpecialEnemies(createBoss);
 		if (createBoss) {
 			world.createBoss(delta);
 			createBoss = false;
@@ -120,7 +121,7 @@ public class WorldController {
 		world.updateEnemyShots(delta,time);
 		world.updatePlayerItems(time);
 		world.updateDropItems(delta);
-		world.createNormalEnemies();
+		//world.createNormalEnemies();
 		jet.update(delta);
 	}
 
@@ -139,6 +140,49 @@ public class WorldController {
 		}
 		if(world.getBoss()!=null){
 			if(time-world.getBoss().getPreviousShot()>=world.getBoss().getTimerShot()){
+				if(world.getBoss().getHp()<world.getBossMaxHp()/2){
+					Random rand = new Random();
+					Shot shot;
+					int type = rand.nextInt(3);
+					switch(type){
+					case 0:
+						shot = new Shot(new Vector2(-2, world.getBoss().getPosition().y),
+								"images/enemyShotTest.png",2f,ActionType.BOMB,0.5f,2);
+						shot.setAngle(30);
+						shot.setTimer(rand.nextDouble()*2+1);
+						shot.setStartingAngle(90);
+						shot.setBulletsPerClick(12);
+						world.getBoss().setDamage(4);
+						break;
+					case 1:
+						shot = new Shot(new Vector2(-2, world.getBoss().getPosition().y),
+								"images/enemyShotTest.png",4f,ActionType.MULTI,0.2f,2);
+						shot.setAngle(5);
+						shot.setStartingAngle(65);
+						shot.setBulletsPerClick(10);
+						world.getBoss().setDamage(6);
+						break;
+					case 2:
+						shot = new Shot(new Vector2(-2, world.getBoss().getPosition().y),
+								"images/enemyShotTest.png",2f,ActionType.BOMB,0.3f,1);
+						shot.setAngle(10);
+						shot.setTimer(rand.nextDouble()*2+1);
+						shot.setStartingAngle(90);
+						shot.setBulletsPerClick(36);
+						world.getBoss().setDamage(5);
+						break;
+					default:
+						shot = new Shot(new Vector2(-2, world.getBoss().getPosition().y),
+								"images/enemyShotTest.png",2f,ActionType.BOMB,0.5f,1);
+						shot.setAngle(30);
+						shot.setTimer(rand.nextDouble()*2+1);
+						shot.setStartingAngle(90);
+						shot.setBulletsPerClick(12);
+						world.getBoss().setDamage(6);
+					}
+					world.getBoss().setShot(shot);
+					world.getBoss().setTimerShot(rand.nextInt(2)+1.5f);
+				}
 				world.shoot(world.getBoss(),time);
 				world.getBoss().setPreviousShot(time);
 			}
@@ -150,8 +194,8 @@ public class WorldController {
 		for(Item item: world.getPlayerItens()){
 			if(item.getEffect() == Effect.SHIELD){
 				Rectangle shieldRect = new Rectangle(jet.getPosition().x-item.getSize()/2,
-						jet.getPosition().y+item.getSize()/2, jet.getBounds().width+item.getSize()/2,
-						jet.getBounds().height+item.getSize()/2);
+						jet.getPosition().y+item.getSize()/2, jet.getSize()+item.getSize()/2,
+						jet.getSize()+item.getSize()/2);
 				List<Bullet> bullets = new ArrayList<Bullet>();
 				for (Bullet shot : world.getEnemiesShots()) {
 					if (shot == null)
@@ -173,8 +217,8 @@ public class WorldController {
 	private void checkCollisionWithItens(float delta) {
 		if (jet.getState() != Jet.State.DYING) {
 			Rectangle jetRect = new Rectangle(jet.getPosition().x,
-					jet.getPosition().y, jet.getBounds().width,
-					jet.getBounds().height);
+					jet.getPosition().y, jet.getSize(),
+					jet.getSize());
 
 			List<Item> rmv = new ArrayList<Item>();
 			for (Item item : world.getDropItens()) {
@@ -186,9 +230,10 @@ public class WorldController {
 					item.getBounds().y = item.getPosition().y;
 				}
 				if (jetRect.overlaps(item.getBounds())) {
+					rmv.add(item);
+					item = item.clonar();
 					item.setStartTime(time);
 					world.getPlayerItens().add(item);
-					rmv.add(item);
 				}
 			}
 			world.getDropItens().removeAll(rmv);
@@ -411,9 +456,8 @@ public class WorldController {
 					if (world.getBoss().getHp() <= 0) {
 						world.getBoss().setState(Enemy.State.DYING);
 						world.getBoss().setStateTime(0);
-						world.setKillCount(world.getKillCount() + 1);
-						world.upDmgJet();
-
+						world.setKillCount(world.getKillCount() + 20);
+						//world.upDmgJet();
 					}
 
 					break;
@@ -474,7 +518,7 @@ public class WorldController {
 						.add(world.getBoss().getVelocity());
 			} else {
 				world.getBoss().getVelocity().x = 0;
-				float jetyPosition = jet.getPosition().y;
+				float jetyPosition = jet.getPosition().y+jet.getSize()/2;
 				if (jetyPosition > world.getBoss().getPosition().y
 						+ Enemy.BOSS_SIZE / 2) {
 					world.getBoss().setyDirection(Enemy.BOSS_SPEED);

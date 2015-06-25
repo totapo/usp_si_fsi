@@ -70,8 +70,7 @@ public class Item {
 		return this.velocity;
 	}
 	
-	@Override
-	protected Object clone() throws CloneNotSupportedException {
+	public Item clonar() {
 		return new Item(size,icon,duration,effect,animation);
 	}
 

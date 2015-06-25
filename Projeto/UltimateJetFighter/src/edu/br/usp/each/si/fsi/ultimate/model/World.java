@@ -32,10 +32,14 @@ public class World {
 	ArrayList<Item> itensPlayer;
 	/** Player Kill count */
 	int killCount;
-
+	private int bossMaxHp;
 	// Getters -----------
 	public Level getLevel(){
 		return level;
+	}
+	
+	public int getBossMaxHp(){
+		return bossMaxHp;
 	}
 	
 	public ArrayList<Block> getBlocks() {
@@ -159,7 +163,7 @@ public class World {
 				this.enemiesShots.add(bullet);
 			} else if(shot.getActionType()==ActionType.BOMB){
 				bullet = new Bullet(shot.getStartingAngle(),shot.getSpeed(),enemy.getPosition().cpy()
-						,shot.getSize(),true,2f,time,shot.getAngle(),shot.getActionType(),shot.getPhases());
+						,shot.getSize(),true,shot.getTimer(),time,shot.getAngle(),shot.getActionType(),shot.getPhases());
 				bullet.setBullets(shot.getBulletsPerClick());
 				bullet.getPosition().y += enemy.getSize() / 2 - bullet.getSize() / 2;
 				bullet.getPosition().x += enemy.getSize()-bullet.getSize();
@@ -240,60 +244,76 @@ public class World {
 		}
 	}
 
-	public void createNormalEnemies() {
+	public void createNormalEnemies(boolean createBoss) {
 		if (enemies.isEmpty()) {
-			Random rd = new Random();
-			int nrEnemies = rd.nextInt(level.getHeight());
-			List<Integer> positions = new ArrayList<Integer>();
-			for (int i = 0; i < level.getHeight(); i++) {
-				positions.add(i);
-			}
-
-			float yDirection;
-			boolean isDirectionRight = rd.nextBoolean();
-			if (isDirectionRight) {
-				yDirection = ((float) rd.nextInt(200)) / 10000;
-			} else {
-				yDirection = -((float) rd.nextInt(200)) / 10000;
-			}
-			while (nrEnemies > 0) {
-				Collections.shuffle(positions);
-				int yPosition = positions.get(0);
-				positions.remove(0);
-				nrEnemies--;
-
-				Enemy enemy = new Enemy(new Vector2(-2, yPosition),new Shot(new Vector2(0, 0),
-						"images/enemyShotTest.png",3f,ActionType.MULTI),
-						1f,false);
-				enemy.getShot().setAngle(15);
-				enemy.getShot().setStartingAngle(75);
-				enemy.getShot().setBulletsPerClick(3);
-				enemy.setyDirection(yDirection);
-
-				enemies.add(enemy);
+			boolean create=(boss!=null);
+			create = (create)?(boss.getHp()>bossMaxHp/2):createBoss;
+			if(create){
+				Random rd = new Random();
+				int nrEnemies = rd.nextInt(level.getHeight());
+				int auxShotDefiner = nrEnemies;
+				List<Integer> positions = new ArrayList<Integer>();
+				for (int i = 0; i < level.getHeight(); i++) {
+					positions.add(i);
+				}
+				float yDirection;
+				boolean isDirectionRight = rd.nextBoolean();
+				if (isDirectionRight) {
+					yDirection = ((float) rd.nextInt(200)) / 10000;
+				} else {
+					yDirection = -((float) rd.nextInt(200)) / 10000;
+				}
+				while (nrEnemies > 0) {
+					Collections.shuffle(positions);
+					int yPosition = positions.get(0);
+					positions.remove(0);
+					nrEnemies--;
+					Enemy enemy;
+					if(auxShotDefiner<=4){
+						enemy= new Enemy(new Vector2(-2, yPosition),new Shot(new Vector2(0, 0),
+							"images/enemyShotTest.png",3f,ActionType.MULTI),
+							1f,false);
+						enemy.getShot().setAngle(15);
+						enemy.getShot().setStartingAngle(75);
+						enemy.getShot().setBulletsPerClick(3);
+						enemy.setyDirection(yDirection);
+					}else{
+						enemy= new Enemy(new Vector2(-2, yPosition),new Shot(new Vector2(0, 0),
+								"images/enemyShotTest.png",3f,ActionType.MULTI),
+								1f,false);
+							enemy.getShot().setAngle(10);
+							enemy.getShot().setStartingAngle(85);
+							enemy.getShot().setBulletsPerClick(2);
+							enemy.setyDirection(yDirection);
+					}
+	
+					enemies.add(enemy);
+				}
 			}
 
 		}
 
 	}
 
-	public void createSpecialEnemies() {
+	public void createSpecialEnemies(boolean createBoss) {
 		if (specialEnemies.size() == 0) {
-
-			Random rd = new Random();
-
-			int yPosition = rd.nextInt(level.getHeight());
-			// enemy.setType(Enemy.EnemyType.SPECIAL);
-			Enemy enemy = new Enemy(new Vector2(-2, yPosition),new Shot(new Vector2(-2, yPosition),
-					"images/enemyShotTest.png",4f,ActionType.PROGRESSING),
-					0.04f,false);
-			enemy.getShot().setAngle(10);
-			//enemy.getShot().setTimer(1);
-			enemy.getShot().setStartingAngle(90);
-			enemy.getShot().setBulletsPerClick(36);
-			enemy.setHp(Enemy.HP * 2);
-			specialEnemies.add(enemy);
-
+			boolean create=(boss!=null);
+			create = (create)?(boss.getHp()>bossMaxHp/2):createBoss;
+			if(create){
+				Random rd = new Random();
+	
+				int yPosition = rd.nextInt(level.getHeight());
+				// enemy.setType(Enemy.EnemyType.SPECIAL);
+				Enemy enemy = new Enemy(new Vector2(-2, yPosition),new Shot(new Vector2(-2, yPosition),
+						"images/enemyShotTest.png",4f,ActionType.PROGRESSING),
+						0.08f,false);
+				enemy.getShot().setAngle(10);
+				//enemy.getShot().setTimer(1);
+				enemy.getShot().setStartingAngle(90);
+				enemy.getShot().setBulletsPerClick(36);
+				enemy.setHp(Enemy.HP * 2);
+				specialEnemies.add(enemy);
+			}
 		}
 
 	}
@@ -306,12 +326,13 @@ public class World {
 					.nextInt((int) (level.getHeight() - 2 * Enemy.BOSS_SIZE)) + Enemy.BOSS_SIZE);
 
 			this.boss = new Enemy(new Vector2(-2, yPosition), new Shot(new Vector2(-2, yPosition),
-					"images/enemyShotTest.png",2f,ActionType.BOMB,0.5f,2), 5f, true);
+					"images/enemyShotTest.png",2f,ActionType.BOMB,0.5f,1), 5f, true);
 			boss.getShot().setAngle(30);
 			boss.getShot().setTimer(1);
 			boss.getShot().setStartingAngle(90);
 			boss.getShot().setBulletsPerClick(12);
-			this.boss.setHp(Enemy.HP * 40);
+			this.bossMaxHp = Enemy.HP * 80;
+			this.boss.setHp(bossMaxHp);
 		}
 
 	}
@@ -460,15 +481,10 @@ public class World {
 	}
 	
 	public void dropItens(Vector2 position, Vector2 velocity){
-		try {
-			Item item = (Item)this.level.getItens().get(0).clone();
+			Item item = (Item)this.level.getItens().get(0).clonar();
 			this.dropItens.add(item);
 			item.setPosition(position);
 			item.setVelocity(velocity);
-		} catch (CloneNotSupportedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
 	public void updatePlayerItems(double time) {

@@ -25,7 +25,7 @@ public class Enemy {
 	
 	
 	public static final float SPECIAL_ACCELERATION = 0.05f; // unit per second
-	public static final float SIZE = 0.6f; // half a unit
+	public static final float SIZE = 0.65f; 
 	public static final int HP = 10;
 	float stateTime = 0;
 	
@@ -41,6 +41,7 @@ public class Enemy {
 	private double timerShot; //controle de tiros por segundo
 	private double previousShot;
 	private int maxNumber;
+	private float size;
 	
 
 	double hp;
@@ -63,6 +64,7 @@ public class Enemy {
 		this.position = position;
 		this.bounds.height = (isBoss)? BOSS_SIZE:SIZE;
 		this.bounds.width = (isBoss)? BOSS_SIZE:SIZE;
+		size = (isBoss)? BOSS_SIZE:SIZE;
 		hp = HP;
 		this.shot = shot;
 		this.setTimerShot(timerShot);
@@ -164,7 +166,7 @@ public class Enemy {
 	}
 
 	public float getSize() {
-		return SIZE;
+		return size;
 	}
 	
 	public void setState(State state) {

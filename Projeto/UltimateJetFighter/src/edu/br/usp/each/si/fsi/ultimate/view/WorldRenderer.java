@@ -180,8 +180,8 @@ public class WorldRenderer {
 		Jet jet = world.getJet();
 		for (Item item : world.getPlayerItens()) {
 			spriteBatch.draw(item.getIconTexture(), jet.getPosition().x-item.getSize()/2,
-					jet.getPosition().y+item.getSize()/2, jet.getBounds().width+item.getSize()/2,
-					jet.getBounds().height+item.getSize()/2);
+					jet.getPosition().y+item.getSize()/2, jet.getSize()+item.getSize()/2,
+					jet.getSize()+item.getSize()/2);
 		}
 	}
 

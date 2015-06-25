@@ -13,7 +13,7 @@ public class Jet {
 	// private float size;
 	private Shot shot; // TODO pode passar pra shots
 	private float speed = 4f; // unit per second
-	private float size = 0.5f; // half a unit
+	private float size = 0.65f; // half a unit
 	private int damage = 5;
 	private float stateTime = 0;
 	private String skin_path;
