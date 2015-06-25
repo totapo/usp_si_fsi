@@ -28,10 +28,13 @@ public class WorldController {
 		BOOST, FIRE, MOVE
 	}
 
+	private static int TIMER_TAKING_DAMAGE = 2;
+	
 	private World world;
 	private Jet jet;
 	private double time;
 	private boolean createBoss = true;
+	private double lastTimeDamage;
 
 	static Map<Keys, Boolean> keys = new HashMap<WorldController.Keys, Boolean>();
 	static {
@@ -100,6 +103,10 @@ public class WorldController {
 		//checkCollisionBetweenShots(delta); retirei essa colisao
 		checkCollisionBetweenBulletsAndShield(delta);
 		checkCollisionWithEnemies(delta);
+		//if(jet.getState()==Jet.State.TAKING_DAMAGE){
+		//	if(time-this.lastTimeDamage>=TIMER_TAKING_DAMAGE)
+		//		jet.setState(Jet.State.MOVING);
+		//} else
 		checkCollisionWithBullets(delta);
 		checkCollisionWithItens(delta);
 		killEnemies(delta);
@@ -258,6 +265,7 @@ public class WorldController {
 					enemy.getBounds().y = enemy.getPosition().y;
 				}
 				if (jetRect.overlaps(enemy.getBounds())) {
+					//TODO game over
 					jet.setState(Jet.State.DYING);
 					jet.setStateTime(0);
 					world.downgradeDmgJet();
@@ -274,6 +282,7 @@ public class WorldController {
 					enemy.getBounds().y = enemy.getPosition().y;
 				}
 				if (jetRect.overlaps(enemy.getBounds())) {
+					//TODO game over
 					jet.setState(Jet.State.DYING);
 					jet.setStateTime(0);
 					world.downgradeDmgJet();
@@ -286,6 +295,7 @@ public class WorldController {
 						.getPosition().x, world.getBoss().getPosition().y,
 						Enemy.BOSS_SIZE, Enemy.BOSS_SIZE);
 				if (jetRect.overlaps(bossRect)) {
+					//TODO game over
 					jet.setState(Jet.State.DYING);
 					jet.setStateTime(0);
 					world.downgradeDmgJet();
@@ -315,11 +325,17 @@ public class WorldController {
 					if(jet.getState()==Jet.State.TAKING_DAMAGE){
 						//Nao remove vida nem bala
 					} else {
-						//TODO Vida
 						bullets.add(shot);
-						jet.setState(Jet.State.DYING);
-						jet.setStateTime(0);
-						world.downgradeDmgJet();
+						jet.setLife(jet.getLife()-shot.getDamage());
+						if(jet.getLife()==0){
+							//TODO game Over;
+						} else {
+							world.getSoundDamage().play();
+							jet.setState(Jet.State.TAKING_DAMAGE);
+							this.lastTimeDamage = time;
+							jet.setStateTime(0);
+							world.downgradeDmgJet();
+						}
 						break;
 					}
 				}

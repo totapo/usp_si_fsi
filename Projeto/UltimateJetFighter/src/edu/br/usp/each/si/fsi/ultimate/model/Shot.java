@@ -16,6 +16,7 @@ public class Shot {
 	private float startingAngle; //ângulo do primeiro tiro.
 	private ActionType bulletType;
 	private int phases;
+	private int damage;
 	
 	private double timer;
 
@@ -29,6 +30,14 @@ public class Shot {
 		return startingAngle;
 	}
 	
+	public int getDamage() {
+		return damage;
+	}
+
+	public void setDamage(int damage) {
+		this.damage = damage;
+	}
+
 	public void setAngle(float angle){
 		this.angle = angle;
 	}

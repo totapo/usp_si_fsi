@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 
@@ -33,9 +34,28 @@ public class World {
 	/** Player Kill count */
 	int killCount;
 	private int bossMaxHp;
+	
+	private Sound soundShot;
+	private Sound soundExplosion;
+	private Sound soundDamage;
+	
 	// Getters -----------
 	public Level getLevel(){
 		return level;
+	}
+	
+	
+	
+	public Sound getSoundShot() {
+		return soundShot;
+	}
+
+	public Sound getSoundExplosion() {
+		return soundExplosion;
+	}
+
+	public Sound getSoundDamage() {
+		return soundDamage;
 	}
 	
 	public int getBossMaxHp(){
@@ -129,6 +149,9 @@ public class World {
 		this.killCount = 0;
 		this.dropItens = new ArrayList<Item>();
 		this.itensPlayer = new ArrayList<Item>();
+		soundDamage = Gdx.audio.newSound(Gdx.files.internal("sounds/damage.mp3"));
+		soundExplosion=Gdx.audio.newSound(Gdx.files.internal("sounds/explosion.mp3"));;
+		soundShot=Gdx.audio.newSound(Gdx.files.internal("sounds/shot.mp3"));;
 		createDemoWorld();
 	}
 
@@ -137,25 +160,30 @@ public class World {
 		if (source instanceof Jet) {
 			shot =((Jet) source).getShot();
 			for(int i=0; i<shot.getBulletsPerClick();i++){
-				bullet = new Bullet(shot.getStartingAngle()+shot.getAngle()*i,shot.getSpeed(),jet.getPosition().cpy(),shot.getSize(),
+				bullet = new Bullet(jet.getDamage(),shot.getStartingAngle()+shot.getAngle()*i,shot.getSpeed(),jet.getPosition().cpy(),shot.getSize(),
 						shot.getActionType());
 				bullet.getPosition().y += jet.getSize() / 2 - bullet.getSize() / 2;
 				this.jetShots.add(bullet);
 			}
+			this.soundShot.play();
 		} else {
 			Enemy enemy = (Enemy) source;
 			shot = enemy.getShot();
 			if(shot.getActionType()==ActionType.MULTI){
 				for(int i=0; i<shot.getBulletsPerClick();i++){
-					bullet = new Bullet(shot.getStartingAngle()+shot.getAngle()*i,shot.getSpeed(),enemy.getPosition().cpy(),shot.getSize()
+					bullet = new Bullet(enemy.getDamage(),shot.getStartingAngle()+shot.getAngle()*i,shot.getSpeed(),enemy.getPosition().cpy(),shot.getSize()
 							,shot.getActionType());
-					
+					//TODO
+					//long id = sound.play(1.0f); // play new sound and keep handle for further manipulation
+					//sound.stop(id);             // stops the sound instance immediately
+					//sound.setPitch(id, 2);      // increases the pitch to 2x the original pitch
+
 					bullet.getPosition().y += enemy.getSize() / 2 - bullet.getSize() / 2;
 					bullet.getPosition().x += enemy.getSize()-bullet.getSize();
 					this.enemiesShots.add(bullet);
 				}
 			} else if(shot.getActionType()==ActionType.PROGRESSING){
-				bullet = new Bullet(shot.getStartingAngle()+shot.getAngle(),shot.getSpeed(),enemy.getPosition().cpy(),shot.getSize(),
+				bullet = new Bullet(enemy.getDamage(),shot.getStartingAngle()+shot.getAngle(),shot.getSpeed(),enemy.getPosition().cpy(),shot.getSize(),
 						shot.getActionType());
 				bullet.getPosition().y += enemy.getSize() / 2 - bullet.getSize() / 2;
 				bullet.getPosition().x += enemy.getSize()-bullet.getSize();
@@ -164,6 +192,7 @@ public class World {
 			} else if(shot.getActionType()==ActionType.BOMB){
 				bullet = new Bullet(shot.getStartingAngle(),shot.getSpeed(),enemy.getPosition().cpy()
 						,shot.getSize(),true,shot.getTimer(),time,shot.getAngle(),shot.getActionType(),shot.getPhases());
+				bullet.setDamage(enemy.getDamage());
 				bullet.setBullets(shot.getBulletsPerClick());
 				bullet.getPosition().y += enemy.getSize() / 2 - bullet.getSize() / 2;
 				bullet.getPosition().x += enemy.getSize()-bullet.getSize();
@@ -183,7 +212,7 @@ public class World {
 				Gdx.app.debug("Enemy", "bomb phase "+shot.getPhases()+": "+bullet.getBullets());
 			} else {
 				Gdx.app.debug("Enemy", "bomb phase "+shot.getPhases()+": "+shot.getBullets());
-				bullet = new Bullet(shot.getAngle()+shot.getVariationAngle()*i,shot.velocity.len(),
+				bullet = new Bullet(shot.getDamage(),shot.getAngle()+shot.getVariationAngle()*i,shot.velocity.len(),
 						shot.getPosition().cpy(),shot.getSize()/2,ActionType.MULTI);
 				bullet.getPosition().y += shot.getSize() / 4;
 				bullet.getPosition().x += shot.getSize()/4;
@@ -191,11 +220,12 @@ public class World {
 			}
 			this.enemiesShots.add(bullet);
 		}
+		this.soundExplosion.play();
 	}
 
 	private void createDemoWorld() {
 		jet = new Jet(new Vector2(3, 5), new Shot(new Vector2(0, 0),
-				"images/shot.png",-8f,ActionType.MULTI));
+				"images/shot.png",-8f,ActionType.MULTI),100);
 		jet.getShot().setBulletsPerClick(3);
 		jet.getShot().setAngle(15f);// 30f);
 		jet.getShot().setStartingAngle(75f);
@@ -276,6 +306,7 @@ public class World {
 						enemy.getShot().setAngle(15);
 						enemy.getShot().setStartingAngle(75);
 						enemy.getShot().setBulletsPerClick(3);
+						enemy.setDamage(3);
 						enemy.setyDirection(yDirection);
 					}else{
 						enemy= new Enemy(new Vector2(-2, yPosition),new Shot(new Vector2(0, 0),
@@ -284,6 +315,7 @@ public class World {
 							enemy.getShot().setAngle(10);
 							enemy.getShot().setStartingAngle(85);
 							enemy.getShot().setBulletsPerClick(2);
+							enemy.setDamage(3);
 							enemy.setyDirection(yDirection);
 					}
 	
@@ -311,6 +343,7 @@ public class World {
 				//enemy.getShot().setTimer(1);
 				enemy.getShot().setStartingAngle(90);
 				enemy.getShot().setBulletsPerClick(36);
+				enemy.setDamage(4);
 				enemy.setHp(Enemy.HP * 2);
 				specialEnemies.add(enemy);
 			}
@@ -331,7 +364,8 @@ public class World {
 			boss.getShot().setTimer(1);
 			boss.getShot().setStartingAngle(90);
 			boss.getShot().setBulletsPerClick(12);
-			this.bossMaxHp = Enemy.HP * 80;
+			boss.getShot().setDamage(5);
+			this.bossMaxHp = Enemy.HP * 120;
 			this.boss.setHp(bossMaxHp);
 		}
 
