@@ -102,7 +102,7 @@ public class GameScreen implements Screen, InputProcessor {
 				controller.movePressed(click);
 			} else {
 				Gdx.app.debug("Jet", "shoot");
-				world.shoot(jet);
+				world.shoot(jet,0);
 			}
 			return true;
 		} else {

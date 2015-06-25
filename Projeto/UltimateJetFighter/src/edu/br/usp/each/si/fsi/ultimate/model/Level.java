@@ -1,6 +1,8 @@
 package edu.br.usp.each.si.fsi.ultimate.model;
 
 import java.util.ArrayList;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Vector2;
 
 
 public class Level {
@@ -25,7 +27,18 @@ public class Level {
 	public void setEnemies(ArrayList<Enemy> enemies) {
 		this.enemies = enemies;
 	}
+	
+	private Texture background;
+	private ArrayList<Item> itens;
 
+	public Texture getBackground(){
+		return background;
+	}
+	
+	public ArrayList<Item> getItens(){
+		return itens;
+	}
+	
 	public int getWidth() {
 		return width;
 	}
@@ -51,6 +64,13 @@ public class Level {
 	}
 
 	public Level() {
+		loadDemoLevel();
+		
+	}
+	
+	public Level(Texture background, ArrayList<Item> itens) {
+		this.background = background;
+		this.itens = itens;
 		loadDemoLevel();
 	}
 

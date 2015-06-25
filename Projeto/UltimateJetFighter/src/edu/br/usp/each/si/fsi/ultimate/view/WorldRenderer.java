@@ -21,6 +21,13 @@ import edu.br.usp.each.si.fsi.ultimate.controller.LevelLoader;
 import edu.br.usp.each.si.fsi.ultimate.model.Block;
 import edu.br.usp.each.si.fsi.ultimate.model.Bullet;
 import edu.br.usp.each.si.fsi.ultimate.model.Enemy;
+import edu.br.usp.each.si.fsi.ultimate.controller.WorldController;
+import edu.br.usp.each.si.fsi.ultimate.model.ActionType;
+import edu.br.usp.each.si.fsi.ultimate.model.Block;
+import edu.br.usp.each.si.fsi.ultimate.model.Bullet;
+import edu.br.usp.each.si.fsi.ultimate.model.Enemy;
+import edu.br.usp.each.si.fsi.ultimate.model.Enemy.State;
+import edu.br.usp.each.si.fsi.ultimate.model.Item;
 import edu.br.usp.each.si.fsi.ultimate.model.Jet;
 import edu.br.usp.each.si.fsi.ultimate.model.Shot;
 import edu.br.usp.each.si.fsi.ultimate.model.World;
@@ -67,6 +74,7 @@ public class WorldRenderer {
 	float time;
 	private Texture enemyShotTexture;
 	private Texture squareTexture;
+	private Texture enemyBombTexture;
 
 	public void setSize(int w, int h) {
 		this.width = w;
@@ -105,6 +113,7 @@ public class WorldRenderer {
 		loadJetAnimations();
 		loadDeathAnimations();
 		loadTextures();
+		//loadItemAnimations(world.getItens());
 	}
 
 	private void loadTextures() {
@@ -116,8 +125,8 @@ public class WorldRenderer {
 		specialEnemyTexture = new Texture(
 				Gdx.files.internal("images/specialEnemy.png"));
 		shotTexture = new Texture(Gdx.files.internal("images/shot.png"));
-		enemyShotTexture = new Texture(
-				Gdx.files.internal("images/enemyShotTest.png"));
+		enemyShotTexture = new Texture(Gdx.files.internal("images/enemyShotTest.png"));
+		enemyBombTexture = new Texture(Gdx.files.internal("images/bala.png"));
 		squareTexture = new Texture(Gdx.files.internal("images/quadrado.png"));
 	}
 
@@ -150,8 +159,10 @@ public class WorldRenderer {
 
 	public void render() {
 		spriteBatch.begin();
-		drawBlocks();
+		drawLevel();
 		drawJet();
+		drawPlayerItens();
+		drawItens(world.getDropItens());
 		drawSpecialEnemies();
 		drawNormalEnemies();
 		drawBoss(world.getBoss());
@@ -164,15 +175,41 @@ public class WorldRenderer {
 		drawHud();
 		this.hudBatch.end();
 	}
+	
+	private void drawPlayerItens() {
+		Jet jet = world.getJet();
+		for (Item item : world.getPlayerItens()) {
+			spriteBatch.draw(item.getIconTexture(), jet.getPosition().x-item.getSize()/2,
+					jet.getPosition().y+item.getSize()/2, jet.getBounds().width+item.getSize()/2,
+					jet.getBounds().height+item.getSize()/2);
+		}
+	}
 
+	private void drawItens(ArrayList<Item> itens) {
+		for (Item item : itens) {
+			spriteBatch.draw(item.getIconTexture(), item.getPosition().x * ppuX,
+					item.getPosition().y * ppuY, item.getSize() * ppuX, item.getSize()
+					* ppuY);
+		}
+	}
+	
 	private void drawEnemyShots() {
 		for (Bullet bullet : world.getEnemiesShots()) {
-			spriteBatch.draw(enemyShotTexture, bullet.getPosition().x * ppuX,
-					bullet.getPosition().y * ppuY, bullet.getSize() / 2,
-					bullet.getSize() / 2, bullet.getSize() * ppuX,
-					bullet.getSize() * ppuY, 1, 1, bullet.getAngle() - 90, 0,
-					0, enemyShotTexture.getWidth(),
-					enemyShotTexture.getHeight(), false, false);
+			spriteBatch.draw(
+					((bullet.getActionType().equals(ActionType.BOMB))?enemyBombTexture:enemyShotTexture), 
+					bullet.getPosition().x* ppuX,
+					bullet.getPosition().y * ppuY,
+					(bullet.getSize()/2)*ppuX, 
+					(bullet.getSize()/2)*ppuY,
+					bullet.getSize() * ppuX,
+					bullet.getSize()* ppuY,
+					1,1,
+					bullet.getAngle()-90,
+					0,0,
+					enemyShotTexture.getWidth(),
+					enemyShotTexture.getHeight(),
+					false,false);
+			if(bullet.isSpin())bullet.setAngle(bullet.getAngle()+bullet.getVariationAngle());
 		}
 	}
 
@@ -213,12 +250,11 @@ public class WorldRenderer {
 
 	}
 
-	private void drawBlocks() {
-		for (Block block : world.getBlocks()) {
-			spriteBatch.draw(blockTexture, block.getPosition().x * ppuX,
-					block.getPosition().y * ppuY, Block.SIZE * ppuX, Block.SIZE
-							* ppuY);
-		}
+	private void drawLevel() {
+		world.getLevel().getBackground();
+		spriteBatch.draw(world.getLevel().getBackground(), 0,
+				0, world.getLevel().getWidth() * ppuX,
+				world.getLevel().getHeight() * ppuY);
 	}
 
 	private void drawNormalEnemies() {

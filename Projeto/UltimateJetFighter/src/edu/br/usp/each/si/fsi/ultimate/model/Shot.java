@@ -14,8 +14,13 @@ public class Shot {
 	private int bulletsPerClick; //quantidade de tiros com um clique.
 	private float angle; //ângulo de variacao entre tiros
 	private float startingAngle; //ângulo do primeiro tiro.
-	private boolean multiAction;
+	private ActionType bulletType;
+	private int phases;
+	
+	private double timer;
 
+	private float size;
+	
 	public void setStartingAngle(float angle){
 		this.startingAngle = angle;
 	}
@@ -36,21 +41,37 @@ public class Shot {
 		return this.angle;
 	}
 	
+	public ActionType getActionType(){
+		return this.bulletType;
+	}
+	
 	public int getBulletsPerClick(){
 		return this.bulletsPerClick;
 	}
 	
-	public boolean isMultiAction(){
-		return this.multiAction;
+	public Shot(Vector2 position, String imgSrc,float speed,ActionType action,float size,int phases) {
+		this.speed=speed;//-0.1f;
+		this.imgSrc = imgSrc;
+		this.position = position;
+		this.bounds.height = size;
+		this.bounds.width = size;
+		this.bulletType = action;
+		this.size = size;
+		this.phases=phases;
 	}
-	
-	public Shot(Vector2 position, String imgSrc,float speed,boolean multiAction) {
+	public Shot(Vector2 position, String imgSrc,float speed,ActionType action) {
 		this.speed=speed;//-0.1f;
 		this.imgSrc = imgSrc;
 		this.position = position;
 		this.bounds.height = SIZE;
 		this.bounds.width = SIZE;
-		this.multiAction = multiAction;
+		size = SIZE;
+		this.bulletType = action;
+		this.phases=0;
+	}
+	
+	public int getPhases(){
+		return phases;
 	}
 	
 	public String getImgSrc(){
@@ -66,11 +87,19 @@ public class Shot {
 	}
 
 	public float getSize() {
-		return SIZE;
+		return size;
 	}
 
 	public float getSpeed() {
 		return speed;
+	}
+
+	public double getTimer() {
+		return timer;
+	}
+
+	public void setTimer(double timer) {
+		this.timer = timer;
 	}
 }
 

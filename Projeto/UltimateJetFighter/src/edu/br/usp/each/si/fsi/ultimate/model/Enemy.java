@@ -25,7 +25,7 @@ public class Enemy {
 	
 	
 	public static final float SPECIAL_ACCELERATION = 0.05f; // unit per second
-	public static final float SIZE = 0.5f; // half a unit
+	public static final float SIZE = 0.6f; // half a unit
 	public static final int HP = 10;
 	float stateTime = 0;
 	
@@ -210,7 +210,6 @@ public class Enemy {
 	public void update(float delta) {
 		stateTime += delta;
 		position.add(velocity.cpy().scl(delta));
-		
 	}
 
 	public double getTimerShot() {

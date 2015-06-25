@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 
 public class World {
@@ -24,11 +26,18 @@ public class World {
 	ArrayList<Bullet> enemiesShots = new ArrayList<Bullet>();
 	/** A world has a level through which jet needs to go through **/
 	Level level;
+	/** Lista de itens presentes no mundo*/
+	ArrayList<Item> dropItens;
+	/** Lista de itens que o usuário pegou*/
+	ArrayList<Item> itensPlayer;
 	/** Player Kill count */
 	int killCount;
 
 	// Getters -----------
-
+	public Level getLevel(){
+		return level;
+	}
+	
 	public ArrayList<Block> getBlocks() {
 		return blocks;
 	}
@@ -107,10 +116,6 @@ public class World {
 		return blocks;
 	}
 
-	public Level getLevel() {
-		return level;
-	}
-
 	public void setLevel(Level level) {
 		this.level = level;
 	}
@@ -118,59 +123,91 @@ public class World {
 	// --------------------
 	public World() {
 		this.killCount = 0;
+		this.dropItens = new ArrayList<Item>();
+		this.itensPlayer = new ArrayList<Item>();
 		createDemoWorld();
 	}
 
-	public void shoot(Object source) {
-		Shot shot;
-		Bullet bullet;
+	public void shoot(Object source,double time) {
+		Shot shot; Bullet bullet;
 		if (source instanceof Jet) {
-			shot = ((Jet) source).getShot();
-			for (int i = 0; i < shot.getBulletsPerClick(); i++) {
-				bullet = new Bullet(shot.getStartingAngle() + shot.getAngle()
-						* i, shot.getSpeed(), jet.getPosition().cpy(),
-						shot.getSize());
-				bullet.getPosition().y += jet.getSize() / 2 - bullet.getSize()
-						/ 2;
+			shot =((Jet) source).getShot();
+			for(int i=0; i<shot.getBulletsPerClick();i++){
+				bullet = new Bullet(shot.getStartingAngle()+shot.getAngle()*i,shot.getSpeed(),jet.getPosition().cpy(),shot.getSize(),
+						shot.getActionType());
+				bullet.getPosition().y += jet.getSize() / 2 - bullet.getSize() / 2;
 				this.jetShots.add(bullet);
 			}
 		} else {
 			Enemy enemy = (Enemy) source;
 			shot = enemy.getShot();
-			if (shot.isMultiAction()) {
-				for (int i = 0; i < shot.getBulletsPerClick(); i++) {
-					bullet = new Bullet(shot.getStartingAngle()
-							+ shot.getAngle() * i, shot.getSpeed(), enemy
-							.getPosition().cpy(), shot.getSize());
-
-					bullet.getPosition().y += enemy.getSize() / 2
-							- bullet.getSize() / 2;
-					bullet.getPosition().x += enemy.getSize()
-							- bullet.getSize();
+			if(shot.getActionType()==ActionType.MULTI){
+				for(int i=0; i<shot.getBulletsPerClick();i++){
+					bullet = new Bullet(shot.getStartingAngle()+shot.getAngle()*i,shot.getSpeed(),enemy.getPosition().cpy(),shot.getSize()
+							,shot.getActionType());
+					
+					bullet.getPosition().y += enemy.getSize() / 2 - bullet.getSize() / 2;
+					bullet.getPosition().x += enemy.getSize()-bullet.getSize();
 					this.enemiesShots.add(bullet);
 				}
-			} else {
-				bullet = new Bullet(shot.getStartingAngle() + shot.getAngle(),
-						shot.getSpeed(), enemy.getPosition().cpy(),
-						shot.getSize());
-				bullet.getPosition().y += enemy.getSize() / 2
-						- bullet.getSize() / 2;
-				bullet.getPosition().x += enemy.getSize() - bullet.getSize();
-				shot.setStartingAngle(shot.getStartingAngle() + shot.getAngle());
+			} else if(shot.getActionType()==ActionType.PROGRESSING){
+				bullet = new Bullet(shot.getStartingAngle()+shot.getAngle(),shot.getSpeed(),enemy.getPosition().cpy(),shot.getSize(),
+						shot.getActionType());
+				bullet.getPosition().y += enemy.getSize() / 2 - bullet.getSize() / 2;
+				bullet.getPosition().x += enemy.getSize()-bullet.getSize();
+				shot.setStartingAngle(shot.getStartingAngle()+shot.getAngle());
+				this.enemiesShots.add(bullet);
+			} else if(shot.getActionType()==ActionType.BOMB){
+				bullet = new Bullet(shot.getStartingAngle(),shot.getSpeed(),enemy.getPosition().cpy()
+						,shot.getSize(),true,2f,time,shot.getAngle(),shot.getActionType(),shot.getPhases());
+				bullet.setBullets(shot.getBulletsPerClick());
+				bullet.getPosition().y += enemy.getSize() / 2 - bullet.getSize() / 2;
+				bullet.getPosition().x += enemy.getSize()-bullet.getSize();
 				this.enemiesShots.add(bullet);
 			}
-
+		}
+	}
+	
+	public void explodeBomb(Bullet shot, boolean fromEnemy,double time){
+		Bullet bullet;
+		for(int i=0; i<shot.getBullets();i++){
+			if(shot.getPhases()>1){
+				bullet = new Bullet(shot.getAngle()+shot.getVariationAngle()*i,
+						shot.velocity.len(),shot.getPosition().cpy()
+						,shot.getSize()/2,true,shot.getTimer()/2,time,shot.getAngle(),ActionType.BOMB,shot.getPhases()-1);
+				bullet.setBullets(shot.getBullets());
+				Gdx.app.debug("Enemy", "bomb phase "+shot.getPhases()+": "+bullet.getBullets());
+			} else {
+				Gdx.app.debug("Enemy", "bomb phase "+shot.getPhases()+": "+shot.getBullets());
+				bullet = new Bullet(shot.getAngle()+shot.getVariationAngle()*i,shot.velocity.len(),
+						shot.getPosition().cpy(),shot.getSize()/2,ActionType.MULTI);
+			
+			
+				bullet.getPosition().y += shot.getSize() / 4;
+				bullet.getPosition().x += shot.getSize()/4;
+				bullet.setSpin(shot.isSpin());
+				this.enemiesShots.add(bullet);
+			}
 		}
 	}
 
 	private void createDemoWorld() {
 		jet = new Jet(new Vector2(3, 5), new Shot(new Vector2(0, 0),
-				"images/shot.png", -8f, true));
+				"images/shot.png",-8f,ActionType.MULTI));
 		jet.getShot().setBulletsPerClick(3);
 		jet.getShot().setAngle(15f);// 30f);
 		jet.getShot().setStartingAngle(75f);
-		level = new Level();
+		ArrayList<Item> itens = createItens();
+		level = new Level(new Texture(
+				Gdx.files.internal("images/backg.png")),itens);
 		// this.blocks = getDrawableBlocks(level.getWidth(), level.getHeight());
+	}
+	
+	private ArrayList<Item> createItens(){
+		ArrayList<Item> itens = new ArrayList<Item>();
+		itens.add(new Item(0.5f, new Texture(
+				Gdx.files.internal("images/sprites/shield/shield3.png")), 5f,Effect.SHIELD,null));
+		return itens;
 	}
 
 	public void createAllenemies() {
@@ -191,9 +228,9 @@ public class World {
 					positions.remove(0);
 					nrEnemies--;
 
-					Enemy enemy = new Enemy(new Vector2(-2, yPosition),
-							new Shot(new Vector2(0, 0),
-									"images/enemyShotTest.png", 3f, true), 1f);
+					Enemy enemy = new Enemy(new Vector2(-2, yPosition),new Shot(new Vector2(0, 0),
+							"images/enemyShotTest.png",3f,ActionType.MULTI),
+							1f);
 					enemy.getShot().setAngle(15);
 					enemy.getShot().setStartingAngle(75);
 					enemy.getShot().setBulletsPerClick(3);
@@ -227,9 +264,9 @@ public class World {
 				positions.remove(0);
 				nrEnemies--;
 
-				Enemy enemy = new Enemy(new Vector2(-2, yPosition),
-						new Shot(new Vector2(0, 0), "images/enemyShotTest.png",
-								3f, true), 1f);
+				Enemy enemy = new Enemy(new Vector2(-2, yPosition),new Shot(new Vector2(0, 0),
+						"images/enemyShotTest.png",3f,ActionType.MULTI),
+						1f);
 				enemy.getShot().setAngle(15);
 				enemy.getShot().setStartingAngle(75);
 				enemy.getShot().setBulletsPerClick(3);
@@ -248,14 +285,17 @@ public class World {
 			Random rd = new Random();
 
 			int yPosition = rd.nextInt(level.getHeight());
-
-			Enemy enemy = new Enemy(new Vector2(-2, yPosition), new Shot(
-					new Vector2(-2, yPosition), "images/enemyShotTest.png", 4f,
-					false), 0.02f);
-			enemy.getShot().setAngle(10);
-			enemy.getShot().setStartingAngle(0);
-			enemy.getShot().setBulletsPerClick(36);
 			// enemy.setType(Enemy.EnemyType.SPECIAL);
+			//Enemy enemy = new Enemy(new Vector2(-2, yPosition),new Shot(new Vector2(-2, yPosition),
+			//		"images/enemyShotTest.png",4f,ActionType.PROGRESSING),
+			//		0.02f);
+			Enemy enemy = new Enemy(new Vector2(-2, yPosition),new Shot(new Vector2(-2, yPosition),
+					"images/enemyShotTest.png",2f,ActionType.BOMB,0.5f,2),
+					5f);
+			enemy.getShot().setAngle(30);
+			enemy.getShot().setTimer(1);
+			enemy.getShot().setStartingAngle(90);
+			enemy.getShot().setBulletsPerClick(12);
 			enemy.setHp(Enemy.HP * 2);
 			specialEnemies.add(enemy);
 
@@ -270,9 +310,8 @@ public class World {
 			yPosition = (int) (rd
 					.nextInt((int) (level.getHeight() - 2 * Enemy.BOSS_SIZE)) + Enemy.BOSS_SIZE);
 
-			this.boss = new Enemy(new Vector2(-2, yPosition), new Shot(
-					new Vector2(-2, yPosition), "images/enemyShotTest.png", 4f,
-					false), 0.02f);
+			this.boss = new Enemy(new Vector2(-2, yPosition), new Shot(new Vector2(-2, yPosition),
+					"images/enemyShotTest.png",2f,ActionType.BOMB,0.5f,2), 5f);
 			this.boss.setHp(Enemy.HP * 40);
 		}
 
@@ -322,16 +361,38 @@ public class World {
 			shot.update(delta);
 		}
 	}
+	
+	public void updateDropItems(float delta) {
+		List<Item> rmvItems = new ArrayList<Item>();
+		for (Item item : this.dropItens) {
+			if (item.getPosition().x > level.getWidth())
+				rmvItems.add(item);
+		}
+		dropItens.removeAll(rmvItems);
+		for (Item item : this.dropItens) {
+			item.update(delta);
+		}
+	}
 
-	public void updateEnemyShots(float delta) {
+	public void updateEnemyShots(float delta,double clock) {
 		List<Bullet> rmvShots = new ArrayList<Bullet>();
-		for (Bullet shot : enemiesShots) {
+		List<Bullet> bombs = new ArrayList<Bullet>();
+ 		for (Bullet shot : enemiesShots) {
 			if (shot.position.x > level.getWidth() || (shot.position.x < 0))
 				rmvShots.add(shot);
+			else if(shot.getActionType().equals(ActionType.BOMB)){
+				if(shot.getTimer()<=(clock-shot.getTimeStart())){
+					bombs.add(shot);
+					rmvShots.add(shot);
+				}
+			}
 		}
 		enemiesShots.removeAll(rmvShots);
 		for (Bullet shot : enemiesShots) {
 			shot.update(delta);
+		}
+		for (Bullet shot : bombs) {
+			this.explodeBomb(shot, true,clock);
 		}
 	}
 
@@ -389,5 +450,35 @@ public class World {
 		default:
 			break;
 		}
+	}
+	
+	public ArrayList<Item> getDropItens(){
+		return this.dropItens;
+	}
+	
+	public ArrayList<Item> getPlayerItens(){
+		return this.itensPlayer;
+	}
+	
+	public void dropItens(Vector2 position, Vector2 velocity){
+		try {
+			Item item = (Item)this.level.getItens().get(0).clone();
+			this.dropItens.add(item);
+			item.setPosition(position);
+			item.setVelocity(velocity);
+		} catch (CloneNotSupportedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public void updatePlayerItems(double time) {
+		List<Item> rmv = new ArrayList<Item>();
+		for(Item item:this.itensPlayer){
+			if(time-item.getStartTime() >= item.getDuration()){
+				rmv.add(item);
+			}
+		}
+		this.itensPlayer.removeAll(rmv);
 	}
 }
