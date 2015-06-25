@@ -14,6 +14,7 @@ public class Bullet {
 	private int phases;
 	private ActionType actionType;
 	private int hp;
+	private int damage;
 	Vector2 position = new Vector2();
 	Vector2 velocity = new Vector2();
 	
@@ -21,6 +22,14 @@ public class Bullet {
 		return phases;
 	}
 	
+	public int getDamage() {
+		return damage;
+	}
+	
+	public void setDamage(int damage) {
+		this.damage = damage;
+	}
+
 	public void setPhases(int phases){
 		this.phases = phases;
 	}
@@ -87,7 +96,8 @@ public class Bullet {
 		this.hp = hp;
 	}
 	
-	public Bullet(float ang, float speed,Vector2 position, float size, ActionType action){
+	public Bullet(int damage,float ang, float speed,Vector2 position, float size, ActionType action){
+		this.damage = damage;
 		this.hp = 3;
 		angle = ang;
 		this.velocity=new Vector2(speed,0);

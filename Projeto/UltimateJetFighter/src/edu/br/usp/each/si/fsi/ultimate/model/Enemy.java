@@ -31,7 +31,7 @@ public class Enemy {
 	
 	private int id;
 	
-
+	private int maxLife, life; 
 	private int id_shot;
 	private int damage;
 	private float velocityTemp;
@@ -66,6 +66,7 @@ public class Enemy {
 		this.bounds.width = (isBoss)? BOSS_SIZE:SIZE;
 		size = (isBoss)? BOSS_SIZE:SIZE;
 		hp = HP;
+		maxLife=(int)hp;
 		this.shot = shot;
 		this.setTimerShot(timerShot);
 		this.setPreviousShot(Gdx.graphics.getRawDeltaTime());
@@ -76,6 +77,22 @@ public class Enemy {
 		
 	}
 	
+	public int getMaxLife() {
+		return maxLife;
+	}
+
+	public void setMaxLife(int maxLife) {
+		this.maxLife = maxLife;
+	}
+
+	public int getLife() {
+		return life;
+	}
+
+	public void setLife(int life) {
+		this.life = life;
+	}
+
 	public int getMaxNumber() {
 		return maxNumber;
 	}
@@ -147,6 +164,7 @@ public class Enemy {
 
 	public void setHp(double hp) {
 		this.hp = hp;
+		this.maxLife =(int) hp;
 	}
 
 	public Rectangle getBounds() {

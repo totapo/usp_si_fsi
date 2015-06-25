@@ -22,10 +22,30 @@ public class Jet {
 	private long xp;
 	private int defense;
 	private int id;
+	private int life;
+	private int maxLife;
 
 	public int getId() {
 		return id;
 	}
+
+	public int getLife() {
+		return life;
+	}
+
+	public void setLife(int life) {
+		this.life = life;
+	}
+
+	public int getMaxLife() {
+		return maxLife;
+	}
+
+	public void setMaxLife(int maxLife) {
+		this.maxLife = maxLife;
+	}
+
+
 
 	public void setId(int id) {
 		this.id = id;
@@ -35,11 +55,13 @@ public class Jet {
 	Rectangle bounds = new Rectangle();
 	State state = State.IDLE;
 
-	public Jet(Vector2 position, Shot shot) {
+	public Jet(Vector2 position, Shot shot, int maxLife) {
 		this.shot = shot;
 		this.position = position;
 		this.bounds.height = size/4;
 		this.bounds.width = size/4;
+		this.maxLife= maxLife;
+		life = maxLife;
 	}
 	
 	public Jet(){

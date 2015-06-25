@@ -174,8 +174,10 @@ public class WorldRenderer {
 		this.hudBatch.begin();
 		drawHud();
 		this.hudBatch.end();
+		drawLifes();
 	}
 	
+
 	private void drawPlayerItens() {
 		Jet jet = world.getJet();
 		for (Item item : world.getPlayerItens()) {
@@ -212,11 +214,58 @@ public class WorldRenderer {
 			if(bullet.isSpin())bullet.setAngle(bullet.getAngle()+bullet.getVariationAngle());
 		}
 	}
+	
+
+	private void drawLifes() {
+		debugRenderer.setProjectionMatrix(cam.combined);
+		debugRenderer.begin(ShapeType.Filled);
+		//DRAW JET LIFE
+		Jet jet = world.getJet();
+		int max = jet.getMaxLife();
+		int hp = jet.getLife();
+		Rectangle rectMax=new Rectangle();
+		rectMax.set((10-0.4f),(0.1f) , 0.2f, 6.8f);
+		debugRenderer.setColor(Color.BLACK);
+		debugRenderer.rect(rectMax.x, rectMax.y, rectMax.width, rectMax.height);
+		debugRenderer.end();
+		if(hp>0){
+			debugRenderer.begin(ShapeType.Filled);
+			//6.8 = max, x = hp, max x = 6.8 hp, x = 6.8 * hp /max
+			Rectangle rectMin=new Rectangle();
+			rectMin.set((10-0.4f),(0.1f) , 0.2f, ((6.8f*hp)/max));
+			debugRenderer.setColor(Color.GREEN);
+			debugRenderer.rect(rectMin.x, rectMin.y, rectMin.width, rectMin.height);
+			debugRenderer.end();
+		}
+		
+		if(world.getBoss()!=null){
+			//DRAW BOSS LIFE
+			debugRenderer.setProjectionMatrix(cam.combined);
+			debugRenderer.begin(ShapeType.Filled);
+			Enemy boss = world.getBoss();
+			max = world.getBossMaxHp();
+			hp = (int) boss.getHp();
+			rectMax=new Rectangle();
+			rectMax.set((0.2f),(0.1f) , 0.2f, 6.8f);
+			debugRenderer.setColor(Color.BLACK);
+			debugRenderer.rect(rectMax.x, rectMax.y, rectMax.width, rectMax.height);
+			debugRenderer.end();
+			if(hp>0){
+				debugRenderer.begin(ShapeType.Filled);
+				//6.8 = max, x = hp, max x = 6.8 hp, x = 6.8 * hp /max
+				Rectangle rectMin=new Rectangle();
+				rectMin.set((0.2f),(0.1f) , 0.2f, ((6.8f*hp)/max));
+				debugRenderer.setColor(Color.RED);
+				debugRenderer.rect(rectMin.x, rectMin.y, rectMin.width, rectMin.height);
+				debugRenderer.end();
+			}
+		}
+	}
 
 	private void drawHud() {
-		hudBatch.draw(enemyTexture, 0.1f * ppuX, 0.1f * ppuY,
+		hudBatch.draw(enemyTexture, (9-0.3f)  * ppuX, 0.1f * ppuY,
 				Enemy.SIZE * ppuX, Enemy.SIZE * ppuY);
-		hudBatch.draw(num.DDOTS.getTexture(), (0.1f) * ppuX, Enemy.SIZE * ppuY,
+		hudBatch.draw(num.DDOTS.getTexture(), (9-0.3f) * ppuX, Enemy.SIZE * ppuY,
 				Enemy.SIZE * ppuX, Enemy.SIZE * ppuY);
 		int kills = world.getKillCount();
 		int[] positions = new int[(kills + "").length()];
@@ -226,7 +275,7 @@ public class WorldRenderer {
 		}
 		float aux = Enemy.SIZE + Enemy.SIZE / 2;
 		for (int a : positions) {
-			hudBatch.draw(Numbers.values()[a].getTexture(), 0.1f * ppuX, aux
+			hudBatch.draw(Numbers.values()[a].getTexture(), (9-0.3f) * ppuX, aux
 					* ppuY, Enemy.SIZE * ppuX, Enemy.SIZE * ppuY);
 			aux += Enemy.SIZE / 2;
 		}
