@@ -38,8 +38,15 @@ public class World {
 	private Sound soundShot;
 	private Sound soundExplosion;
 	private Sound soundDamage;
+	private Sound soundBackground;
+	
+	long idBackground;
 	
 	// Getters -----------
+	public Sound getSoundBackground(){
+		return soundBackground;
+	}
+	
 	public Level getLevel(){
 		return level;
 	}
@@ -151,7 +158,8 @@ public class World {
 		this.itensPlayer = new ArrayList<Item>();
 		soundDamage = Gdx.audio.newSound(Gdx.files.internal("sounds/damage.mp3"));
 		soundExplosion=Gdx.audio.newSound(Gdx.files.internal("sounds/explosion.mp3"));;
-		soundShot=Gdx.audio.newSound(Gdx.files.internal("sounds/shot.mp3"));;
+		soundShot=Gdx.audio.newSound(Gdx.files.internal("sounds/shot.mp3"));
+		soundBackground=Gdx.audio.newSound(Gdx.files.internal("sounds/backgroundSound.mp3"));
 		createDemoWorld();
 	}
 
@@ -201,7 +209,7 @@ public class World {
 		}
 	}
 	
-	public void explodeBomb(Bullet shot, boolean fromEnemy,double time){
+	public void explodeBomb(Bullet shot, boolean fromEnemy,double time,boolean som){
 		Bullet bullet;
 		for(int i=0; i<shot.getBullets();i++){
 			if(shot.getPhases()>1){
@@ -220,12 +228,12 @@ public class World {
 			}
 			this.enemiesShots.add(bullet);
 		}
-		this.soundExplosion.play();
+		if(som)this.soundExplosion.play();
 	}
 
 	private void createDemoWorld() {
 		jet = new Jet(new Vector2(3, 5), new Shot(new Vector2(0, 0),
-				"images/shot.png",-8f,ActionType.MULTI),100);
+				"images/shot.png",-8f,ActionType.MULTI),75);
 		jet.getShot().setBulletsPerClick(3);
 		jet.getShot().setAngle(15f);// 30f);
 		jet.getShot().setStartingAngle(75f);
@@ -238,7 +246,7 @@ public class World {
 	private ArrayList<Item> createItens(){
 		ArrayList<Item> itens = new ArrayList<Item>();
 		itens.add(new Item(0.5f, new Texture(
-				Gdx.files.internal("images/sprites/shield/shield3.png")), 5f,Effect.SHIELD,null));
+				Gdx.files.internal("images/sprites/shield/shield3.png")), 2.5f,Effect.SHIELD,null));
 		return itens;
 	}
 
@@ -275,6 +283,9 @@ public class World {
 	}
 
 	public void createNormalEnemies(boolean createBoss) {
+		//this.idBackground = soundBackground.play();      // plays the sound a second time, this is treated as a different instance
+		//soundBackground.setPan(idBackground, -1, 1);    // sets the pan of the sound to the left side at full volume
+		//soundBackground.setLooping(idBackground, true); // keeps the sound looping
 		if (enemies.isEmpty()) {
 			boolean create=(boss!=null);
 			create = (create)?(boss.getHp()>bossMaxHp/2):createBoss;
@@ -330,7 +341,7 @@ public class World {
 	public void createSpecialEnemies(boolean createBoss) {
 		if (specialEnemies.size() == 0) {
 			boolean create=(boss!=null);
-			create = (create)?(boss.getHp()>bossMaxHp/2):createBoss;
+			create = (create)?(boss.getHp()>bossMaxHp/3):createBoss;
 			if(create){
 				Random rd = new Random();
 	
@@ -364,8 +375,8 @@ public class World {
 			boss.getShot().setTimer(1);
 			boss.getShot().setStartingAngle(90);
 			boss.getShot().setBulletsPerClick(12);
-			boss.getShot().setDamage(5);
-			this.bossMaxHp = Enemy.HP * 120;
+			boss.getShot().setDamage(10);
+			this.bossMaxHp = Enemy.HP * 300;
 			this.boss.setHp(bossMaxHp);
 		}
 
@@ -446,8 +457,9 @@ public class World {
 			shot.update(delta);
 		}
 		for (Bullet shot : bombs) {
-			this.explodeBomb(shot, true,clock);
+			this.explodeBomb(shot, true,clock,false);
 		}
+		if(bombs.size()>0)this.soundExplosion.play();
 	}
 
 	public void upDmgJet() {

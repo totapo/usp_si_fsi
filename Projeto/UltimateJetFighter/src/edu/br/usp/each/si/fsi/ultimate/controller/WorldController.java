@@ -99,6 +99,7 @@ public class WorldController {
 	public void update(float delta) {
 		processInput();
 		time+=Gdx.graphics.getRawDeltaTime();
+		
 		//checkCollisionWithBlocks(delta);
 		//checkCollisionBetweenShots(delta); retirei essa colisao
 		checkCollisionBetweenBulletsAndShield(delta);
@@ -119,7 +120,7 @@ public class WorldController {
 		world.updateJetShots(delta);
 		world.createNormalEnemies(createBoss);
 		world.createSpecialEnemies(createBoss);
-		if (createBoss) {
+		if (createBoss && this.time>=40) {
 			world.createBoss(delta);
 			createBoss = false;
 		}
@@ -147,7 +148,7 @@ public class WorldController {
 		}
 		if(world.getBoss()!=null){
 			if(time-world.getBoss().getPreviousShot()>=world.getBoss().getTimerShot()){
-				if(world.getBoss().getHp()<world.getBossMaxHp()/2){
+				if(world.getBoss().getHp()<world.getBossMaxHp()/2+world.getBossMaxHp()/4){
 					Random rand = new Random();
 					Shot shot;
 					int type = rand.nextInt(3);
@@ -159,7 +160,7 @@ public class WorldController {
 						shot.setTimer(rand.nextDouble()*2+1);
 						shot.setStartingAngle(90);
 						shot.setBulletsPerClick(12);
-						world.getBoss().setDamage(4);
+						world.getBoss().setDamage(9);
 						break;
 					case 1:
 						shot = new Shot(new Vector2(-2, world.getBoss().getPosition().y),
@@ -167,7 +168,7 @@ public class WorldController {
 						shot.setAngle(5);
 						shot.setStartingAngle(65);
 						shot.setBulletsPerClick(10);
-						world.getBoss().setDamage(6);
+						world.getBoss().setDamage(11);
 						break;
 					case 2:
 						shot = new Shot(new Vector2(-2, world.getBoss().getPosition().y),
@@ -176,7 +177,7 @@ public class WorldController {
 						shot.setTimer(rand.nextDouble()*2+1);
 						shot.setStartingAngle(90);
 						shot.setBulletsPerClick(36);
-						world.getBoss().setDamage(5);
+						world.getBoss().setDamage(10);
 						break;
 					default:
 						shot = new Shot(new Vector2(-2, world.getBoss().getPosition().y),
@@ -185,7 +186,7 @@ public class WorldController {
 						shot.setTimer(rand.nextDouble()*2+1);
 						shot.setStartingAngle(90);
 						shot.setBulletsPerClick(12);
-						world.getBoss().setDamage(6);
+						world.getBoss().setDamage(11);
 					}
 					world.getBoss().setShot(shot);
 					world.getBoss().setTimerShot(rand.nextInt(2)+1.5f);
@@ -201,8 +202,8 @@ public class WorldController {
 		for(Item item: world.getPlayerItens()){
 			if(item.getEffect() == Effect.SHIELD){
 				Rectangle shieldRect = new Rectangle(jet.getPosition().x-item.getSize()/2,
-						jet.getPosition().y+item.getSize()/2, jet.getSize()+item.getSize()/2,
-						jet.getSize()+item.getSize()/2);
+						jet.getPosition().y-item.getSize()/2, jet.getSize()+item.getSize()/2,
+						jet.getSize()+item.getSize());
 				List<Bullet> bullets = new ArrayList<Bullet>();
 				for (Bullet shot : world.getEnemiesShots()) {
 					if (shot == null)
@@ -329,6 +330,9 @@ public class WorldController {
 						jet.setLife(jet.getLife()-shot.getDamage());
 						if(jet.getLife()==0){
 							//TODO game Over;
+							jet.setState(Jet.State.DYING);
+							jet.setStateTime(0);
+							world.downgradeDmgJet();
 						} else {
 							world.getSoundDamage().play();
 							jet.setState(Jet.State.TAKING_DAMAGE);
@@ -366,7 +370,7 @@ public class WorldController {
 					if(shot.getBounds().overlaps(eShot.getBounds())){
 						jetBulletsRmv.add(shot);
 						if(eShot.getActionType()==ActionType.BOMB){
-							world.explodeBomb(eShot, true,time);
+							world.explodeBomb(eShot, true,time,true);
 							enemyBulletsRmv.add(eShot);
 						} else if(eShot.getHp()==1){
 							enemyBulletsRmv.add(eShot);
@@ -407,7 +411,7 @@ public class WorldController {
 						enemy.setStateTime(0);
 						Random r = new Random();
 						int chance = r.nextInt(100)+1;
-						if(chance>=0){
+						if(chance>=90){
 							Gdx.app.debug("Item", "OK: "+enemy.getVelocity().len());
 							world.dropItens(enemy.getPosition().cpy(),new Vector2(1,0));
 						}
@@ -439,6 +443,12 @@ public class WorldController {
 					if (enemy.getHp() <= 0) {
 						enemy.setState(Enemy.State.DYING);
 						enemy.setStateTime(0);
+						Random r = new Random();
+						int chance = r.nextInt(100)+1;
+						if(chance>=95){
+							Gdx.app.debug("Item", "OK: "+enemy.getVelocity().len());
+							world.dropItens(enemy.getPosition().cpy(),new Vector2(1,0));
+						}
 						world.setKillCount(world.getKillCount() + 1);
 						world.upDmgJet();
 

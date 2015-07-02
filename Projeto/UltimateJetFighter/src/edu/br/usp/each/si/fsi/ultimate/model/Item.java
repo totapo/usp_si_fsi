@@ -74,8 +74,6 @@ public class Item {
 		return new Item(size,icon,duration,effect,animation);
 	}
 
-
-
 	public Texture getIconTexture(){
 		return icon;
 	}
